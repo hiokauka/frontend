@@ -1,11 +1,7 @@
 import * as React from 'react';
-import Link from '@mui/material/Link';
+import { Link } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Title from './Title';
-
-function preventDefault(event) {
-  event.preventDefault();
-}
 
 export default function Deposits() {
   return (
@@ -18,7 +14,7 @@ export default function Deposits() {
         on 15 March, 2019
       </Typography>
       <div>
-        <Link color="primary" href="#" onClick={preventDefault}>
+        <Link to="/balance" color="primary">
           View balance
         </Link>
       </div>

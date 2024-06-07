@@ -11,6 +11,8 @@ import Currencyexchg from './component/CurrencyExchange';
 import Expenditureanalyst from './component/Expenditureanalysis';
 import Settings from './component/Settings';
 import Transfer from './component/Transfer';
+import Balance from './component/Balance';
+import AddCard from './component/AddCard';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
           <Route path="/expenditureanalysis" element={<Expenditureanalyst/>} />
           <Route path="/settings" element={<Settings/>} />
           <Route path="/transfer" element={<Transfer/>} />
+          <Route path="/balance" element={<Balance/>} />
+          <Route path="/Addcard" element={<AddCard/>} />
         </Routes>
       </div>
     </Router>

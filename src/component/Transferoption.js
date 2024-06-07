@@ -10,7 +10,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogActions
+  DialogActions,
+  Snackbar,
 } from '@mui/material';
 
 class TransferOptions extends React.Component {
@@ -18,10 +19,11 @@ class TransferOptions extends React.Component {
     super(props);
     this.state = {
       amount: '',
-      to: '',
-      category: '',
-      type: '',
-      successDialogOpen: false // State for success dialog
+      currency: '',
+      searchQuery: '',
+      pin: '',
+      successDialogOpen: false,
+      notificationOpen: false,
     };
   }
 
@@ -32,17 +34,21 @@ class TransferOptions extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
+    // Mocking pin validation
+    if (this.state.pin !== '1234') {
+      alert('Invalid PIN');
+      return;
+    }
     // Handle form submission logic here
     console.log('Form submitted:', this.state);
     // Reset form fields
     this.setState({
       amount: '',
-      to: '',
-      category: '',
-      type: ''
+      currency: '',
+      searchQuery: '',
+      pin: '',
+      successDialogOpen: true,
     });
-    // Open success dialog
-    this.setState({ successDialogOpen: true });
   };
 
   handleSuccessDialogClose = () => {
@@ -54,6 +60,13 @@ class TransferOptions extends React.Component {
     console.log('Printing receipt...');
   };
 
+  handleNotificationClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ notificationOpen: false });
+  };
+
   render() {
     return (
       <Paper elevation={3} style={{ padding: '20px' }}>
@@ -62,6 +75,17 @@ class TransferOptions extends React.Component {
         </Typography>
         <form onSubmit={this.handleSubmit}>
           <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                required
+                id="searchQuery"
+                name="searchQuery"
+                label="Search for Name or Telephone Number"
+                fullWidth
+                value={this.state.searchQuery}
+                onChange={this.handleChange}
+              />
+            </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 required
@@ -77,50 +101,35 @@ class TransferOptions extends React.Component {
             <Grid item xs={12} sm={6}>
               <TextField
                 required
-                id="to"
-                name="to"
-                label="To"
+                id="currency"
+                name="currency"
+                select
+                label="Currency"
                 fullWidth
-                value={this.state.to}
+                value={this.state.currency}
+                onChange={this.handleChange}
+              >
+                <MenuItem value="USD">USD</MenuItem>
+                <MenuItem value="EUR">EUR</MenuItem>
+                <MenuItem value="GBP">GBP</MenuItem>
+                {/* Add more currencies as needed */}
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                id="pin"
+                name="pin"
+                label="Security PIN"
+                fullWidth
+                type="password"
+                value={this.state.pin}
                 onChange={this.handleChange}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                id="category"
-                name="category"
-                select
-                label="Category"
-                fullWidth
-                value={this.state.category}
-                onChange={this.handleChange}
-              >
-                <MenuItem value="food">Food</MenuItem>
-                <MenuItem value="transport">Transport</MenuItem>
-                <MenuItem value="utility">Utility</MenuItem>
-                {/* Add more options as needed */}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                id="type"
-                name="type"
-                select
-                label="Type"
-                fullWidth
-                value={this.state.type}
-                onChange={this.handleChange}
-              >
-                <MenuItem value="debit">Debit</MenuItem>
-                <MenuItem value="credit">Credit</MenuItem>
-                {/* Add more options as needed */}
-              </TextField>
-            </Grid>
           </Grid>
           <Button type="submit" variant="contained" color="primary" style={{ marginTop: '20px' }}>
-            Submit
+            Proceed
           </Button>
         </form>
         {/* Success Dialog */}
@@ -145,6 +154,18 @@ class TransferOptions extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
+        {/* Notification */}
+        <Snackbar
+          open={this.state.notificationOpen}
+          autoHideDuration={6000}
+          onClose={this.handleNotificationClose}
+          message="Transaction Successful!"
+          action={
+            <Button color="secondary" size="small" onClick={this.handlePrintReceipt}>
+              Print Receipt
+            </Button>
+          }
+        />
       </Paper>
     );
   }

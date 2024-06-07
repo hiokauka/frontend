@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -9,9 +9,6 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -21,11 +18,12 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { mainListItems } from './listItems';
-import Chart from './Chart';
-import Deposits from './Deposits';
-import Orders from './Orders';
+import Container from '@mui/material/Container';
+import { mainListItems } from '../dashboard/listItems';
 import { useNavigate } from 'react-router-dom';
+import ShowBalance from './showbalance'; // Import the ShowBalance component
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 
 function Copyright(props) {
   return (
@@ -50,7 +48,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#8B4513', // Change 'your_color_here' to the desired color value
+  backgroundColor: '#8B4513',
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -166,7 +164,6 @@ export default function Dashboard() {
           <Divider />
           <List component="nav">
             {mainListItems}
-          
           </List>
         </Drawer>
         <Box
@@ -181,20 +178,6 @@ export default function Dashboard() {
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-              {/* Chart */}
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <Chart />
-                </Paper>
-              </Grid>
-              {/* Recent Deposits */}
               <Grid item xs={12} md={4} lg={3}>
                 <Paper
                   sx={{
@@ -204,13 +187,7 @@ export default function Dashboard() {
                     height: 240,
                   }}
                 >
-                  <Deposits />
-                </Paper>
-              </Grid>
-              {/* Recent Orders */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
+                  <ShowBalance height={800} width={300} /> 
                 </Paper>
               </Grid>
             </Grid>
@@ -241,4 +218,5 @@ export default function Dashboard() {
       </Dialog>
     </ThemeProvider>
   );
-}
+  }
+  

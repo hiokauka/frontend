@@ -10,7 +10,7 @@ import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import HomeIcon from '@mui/icons-material/Home';
 import PaymentIcon from '@mui/icons-material/Payment';
-
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 export const mainListItems = (
   <React.Fragment>
@@ -19,6 +19,12 @@ export const mainListItems = (
         <HomeIcon />
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
+    </ListItemButton>
+    <ListItemButton component={Link} to="/balance">
+      <ListItemIcon>
+        <AccountBalanceWalletIcon />
+      </ListItemIcon>
+      <ListItemText primary="Balance" />
     </ListItemButton>
     <ListItemButton component={Link} to="/transfer">
       <ListItemIcon>
