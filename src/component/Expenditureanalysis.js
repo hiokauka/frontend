@@ -46,7 +46,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#8B4513',
+  backgroundColor: '#5A2207',
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -168,15 +168,19 @@ export default function Dashboard() {
         <Box
           component="main"
           sx={{
-            backgroundColor: '#FAEBD7',
             flexGrow: 1,
             height: '100vh',
-            overflow: 'auto',
+            overflow: 'auto', // Ensure scrolling
+            position: 'relative',
+            backgroundImage: 'url(/bggringgot.jpg)', // Replace with your image path
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 1, // Ensure background image is behind content
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <BasicPie width={1000} height={1000} />
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4, zIndex: 2, position: 'relative' }}>
+            <BasicPie />
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>

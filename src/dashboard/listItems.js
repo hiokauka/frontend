@@ -20,12 +20,7 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItemButton>
-    <ListItemButton component={Link} to="/balance">
-      <ListItemIcon>
-        <AccountBalanceWalletIcon />
-      </ListItemIcon>
-      <ListItemText primary="Balance" />
-    </ListItemButton>
+   
     <ListItemButton component={Link} to="/transfer">
       <ListItemIcon>
       <PaymentIcon/>

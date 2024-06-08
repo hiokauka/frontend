@@ -9,59 +9,31 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
 const columns = [
-  { id: 'ref', label: 'Ref', minWidth: 65 },
-  {
-    id: 'Date',
-    label: 'Date',
-    minWidth: 140,
-    align: 'center',
-  },
-  {
-    id: 'Category',
-    label: 'Category',
-    minWidth: 100,
-    align: 'center',
-  },
-  { id: 'from', label: 'From', minWidth: 100, align: 'center' },
-  {
-    id: 'to',
-    label: 'To',
-    minWidth: 100,
-    align: 'right',
-  },
-  {
-    id: 'type',
-    label: 'Type',
-    minWidth: 170,
-    align: 'right',
-  },
-  {
-    id: 'status',
-    label: 'Status',
-    minWidth: 170,
-    align: 'right',
-  },
-  {
-    id: 'amount',
-    label: 'Amount',
-    minWidth: 170,
-    align: 'right',
-    format: (value) => value.toFixed(2),
-  },
+  { id: 'Transaction ID', label: 'Transaction ID', minWidth: 65 },
+  { id: 'Date', label: 'Date', minWidth: 140, align: 'center' },
+  { id: 'From', label: 'From', minWidth: 100, align: 'center' },
+  { id: 'To', label: 'To', minWidth: 100, align: 'right' },
+  { id: 'Payment Method', label: 'Payment Method', minWidth: 170, align: 'right' },
+  { id: 'Card Number', label: 'Card Number', minWidth: 170, align: 'right' },
+  { id: 'Amount', label: 'Amount', minWidth: 170, align: 'right' },
+  { id: 'Currency', label: 'Currency', minWidth: 100, align: 'right' },
+  { id: 'Category', label: 'Category', minWidth: 170, align: 'right' },
+  { id: 'Download Receipt', label: 'Download Receipt', minWidth: 170, align: 'right' },
 ];
 
-function createData(ref, from, to, type, status, amount) {
-  return { ref, from, to, type, status, amount };
+function createData(ref, date, from, to, paymentMethod, cardNumber, amount, currency, category) {
+  return { 'Transaction ID': ref, 'Date': date, 'From': from, 'To': to, 'Payment Method': paymentMethod, 'Card Number': cardNumber, 'Amount': amount, 'Currency': currency, 'Category': category };
 }
 
 const rows = [
-  createData('REF001', 'Alice', 'Bob', 'Transfer', 'Completed', 1500.75),
-  createData('REF002', 'Charlie', 'Dave', 'Payment', 'Pending', 200.50),
-  createData('REF003', 'Eve', 'Frank', 'Withdrawal', 'Failed', 3000.00),
-  createData('REF004', 'Grace', 'Heidi', 'Deposit', 'Completed', 250.25),
-  createData('REF005', 'Ivan', 'Judy', 'Transfer', 'Pending', 500.00),
+  createData('REF001', '2024-06-10', 'Alice', 'Bob', 'Online Banking', '', 1500.75, 'USD', 'Transfer'),
+  createData('REF002', '2024-06-11', 'Charlie', 'Dave', 'Card', '1234 5678 9012 3456', 200.50, 'EUR', 'Payment'),
+  createData('REF003', '2024-06-12', 'Eve', 'Frank', 'Online Banking', '', 3000.00, 'USD', 'Withdrawal'),
+  createData('REF004', '2024-06-13', 'Grace', 'Heidi', 'Card', '9876 5432 1098 7654', 250.25, 'USD', 'Deposit'),
+  createData('REF005', '2024-06-14', 'Ivan', 'Judy', 'Card', '1111 2222 3333 4444', 500.00, 'USD', 'Transfer'),
 ];
 
 export default function StickyHeadTable() {
@@ -125,9 +97,14 @@ export default function StickyHeadTable() {
                       const value = row[column.id];
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
+                          {column.id === 'Download Receipt' ? (
+                            <Button variant="contained" color="primary">
+                              Download
+                            </Button>
+                          ) : (
+                            column.format && typeof value === 'number' ?
+                              column.format(value) : value
+                          )}
                         </TableCell>
                       );
                     })}

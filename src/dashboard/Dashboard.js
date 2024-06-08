@@ -50,7 +50,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#8B4513', // Change 'your_color_here' to the desired color value
+  backgroundColor: '#5A2207', // Change 'your_color_here' to the desired color value
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -72,6 +72,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
         duration: theme.transitions.duration.enteringScreen,
       }),
       boxSizing: 'border-box',
+      
       ...(!open && {
         overflowX: 'hidden',
         transition: theme.transitions.create('width', {
@@ -172,10 +173,14 @@ export default function Dashboard() {
         <Box
           component="main"
           sx={{
-            backgroundColor: '#FAEBD7',
             flexGrow: 1,
             height: '100vh',
             overflow: 'auto',
+            position: 'relative',
+            backgroundImage: 'url(/bggringgot.jpg)', // Replace with your image path
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 1,
           }}
         >
           <Toolbar />

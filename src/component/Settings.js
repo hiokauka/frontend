@@ -18,7 +18,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import Container from '@mui/material/Container'; // <-- Add this import
+import Container from '@mui/material/Container';
 import { mainListItems } from '../dashboard/listItems';
 import { useNavigate } from 'react-router-dom';
 import SettingsComponent from './Settingsoption';
@@ -46,7 +46,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#8B4513',
+  backgroundColor: '#5A2207',
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -68,6 +68,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
         duration: theme.transitions.duration.enteringScreen,
       }),
       boxSizing: 'border-box',
+      
       ...(!open && {
         overflowX: 'hidden',
         transition: theme.transitions.create('width', {
@@ -162,21 +163,24 @@ export default function Dashboard() {
           <Divider />
           <List component="nav">
             {mainListItems}
-          
           </List>
         </Drawer>
         <Box
           component="main"
           sx={{
-            backgroundColor: '#FAEBD7',
             flexGrow: 1,
             height: '100vh',
             overflow: 'auto',
+            position: 'relative',
+            backgroundImage: 'url(/bggringgot.jpg)', // Replace with your image path
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 1,
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <SettingsComponent />
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4, zIndex: 2, position: 'relative' }}>
+            <SettingsComponent />
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>

@@ -30,7 +30,14 @@ export default function ExpensePieChart() {
   const totalExpenses = selectedData.reduce((total, expense) => total + expense.value, 0);
 
   return (
-    <Box p="10%">
+    <Box
+      p="10%"
+      sx={{
+        backgroundColor: '#ffffff', // Set to white or any color you prefer
+        borderRadius: '8px', // Optional: add border radius
+        boxShadow: 3, // Optional: add shadow for better visual appearance
+      }}
+    >
       <FormControl fullWidth sx={{ mb: 4 }}>
         <InputLabel id="month-select-label">Select Month</InputLabel>
         <Select

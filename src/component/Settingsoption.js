@@ -22,6 +22,7 @@ const SettingsComponent = () => {
   const [securityQuestion, setSecurityQuestion] = useState('');
   const [securityAnswer, setSecurityAnswer] = useState('');
   const [securityPIN, setSecurityPIN] = useState('');
+  
   const handleSaveChanges = () => {
     // Logic to save changes to the backend
     console.log('Changes saved successfully!');
@@ -32,7 +33,6 @@ const SettingsComponent = () => {
     console.log('Add card clicked!');
   };
 
-
   return (
     <div>
       <Typography variant="h6">Account Settings</Typography>
@@ -42,6 +42,7 @@ const SettingsComponent = () => {
         onChange={(e) => setFullName(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Gender"
@@ -49,6 +50,7 @@ const SettingsComponent = () => {
         onChange={(e) => setGender(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Date of Birth"
@@ -57,6 +59,7 @@ const SettingsComponent = () => {
         onChange={(e) => setDateOfBirth(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Street Name 1"
@@ -64,6 +67,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, streetName1: e.target.value })}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Street Name 2"
@@ -71,6 +75,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, streetName2: e.target.value })}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Town"
@@ -78,6 +83,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, town: e.target.value })}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="State"
@@ -85,6 +91,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, state: e.target.value })}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Postcode"
@@ -92,6 +99,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, postcode: e.target.value })}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Country"
@@ -99,6 +107,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, country: e.target.value })}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Profile Image URL"
@@ -106,6 +115,7 @@ const SettingsComponent = () => {
         onChange={(e) => setUserImage(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Email Address"
@@ -113,6 +123,7 @@ const SettingsComponent = () => {
         onChange={(e) => setEmailAddress(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Username"
@@ -120,6 +131,7 @@ const SettingsComponent = () => {
         onChange={(e) => setUsername(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Password"
@@ -128,6 +140,7 @@ const SettingsComponent = () => {
         onChange={(e) => setPassword(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Telephone Number"
@@ -135,6 +148,7 @@ const SettingsComponent = () => {
         onChange={(e) => setTelephoneNumber(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Security Question"
@@ -142,6 +156,7 @@ const SettingsComponent = () => {
         onChange={(e) => setSecurityQuestion(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Security Answer"
@@ -149,6 +164,7 @@ const SettingsComponent = () => {
         onChange={(e) => setSecurityAnswer(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
       <TextField
         label="Security PIN"
@@ -157,18 +173,18 @@ const SettingsComponent = () => {
         onChange={(e) => setSecurityPIN(e.target.value)}
         fullWidth
         margin="normal"
+        sx={{ backgroundColor: 'white' }} // Set background color to white
       />
-   <Link to="/Addcard" color="inherit" underline="none">
-        <Button variant="contained" color="primary">
+      <Link to="/Addcard" color="inherit" underline="none">
+        <Button variant="contained" color="primary" sx={{ mt: 2, mr: 2 }}>
           Add Card
         </Button>
       </Link>
-
-        <Button variant="contained" color="primary" onClick={handleSaveChanges}>
+      <Button variant="contained" color="primary" onClick={handleSaveChanges} sx={{ mt: 2 }}>
         Save Changes
-        </Button>
-        </div>
-        );
-        };
+      </Button>
+    </div>
+  );
+};
 
-        export default SettingsComponent
+export default SettingsComponent;

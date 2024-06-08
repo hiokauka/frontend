@@ -18,10 +18,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import Container from '@mui/material/Container'; // <-- Add this import
+import Container from '@mui/material/Container';
 import { mainListItems } from '../dashboard/listItems';
 import { useNavigate } from 'react-router-dom';
-import Chart from './CurrencyChart';
+import CurrencyChanger from './currencychanger';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 
@@ -48,7 +48,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#8B4513',
+  backgroundColor: '#5A2207',
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -170,61 +170,33 @@ export default function Dashboard() {
         <Box
           component="main"
           sx={{
-            backgroundColor: '#FAEBD7',
             flexGrow: 1,
             height: '100vh',
             overflow: 'auto',
+            position: 'relative',
+            backgroundImage: 'url(/bggringgot.jpg)', // Replace with your image path
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 1,
           }}
         >
           <Toolbar />
           <Grid container spacing={3}>
-  {/* Chart */}
-  <Grid item xs={12} md={8} lg={9}>
-    <Paper
-      sx={{
-        p: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        height: 240,
-      }}
-    >
-      <Chart />
-    </Paper>
-  </Grid>
-</Grid>
-<Grid container spacing={3}>
-  {/* Chart */}
-  <Grid item xs={12} md={8} lg={9}>
-    <Paper
-      sx={{
-        p: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        height: 240,
-      }}
-    >
-      <Chart />
-    </Paper>
-  </Grid>
-</Grid>
-<Grid container spacing={3}>
-  {/* Chart */}
-  <Grid item xs={12} md={8} lg={9}>
-    <Paper
-      sx={{
-        p: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        // Remove fixed height to prevent expanding
-      }}
-    >
-      <Chart />
-    </Paper>
-  </Grid>
-</Grid>
-<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-  <Copyright sx={{ pt: 4 }} />
-</Container>
+            <Grid item xs={12}>
+              <Paper
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <CurrencyChanger />
+              </Paper>
+            </Grid>
+          </Grid>
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Copyright sx={{ pt: 4 }} />
+          </Container>
         </Box>
       </Box>
       <Dialog

@@ -22,6 +22,8 @@ import Container from '@mui/material/Container';
 import { mainListItems } from '../dashboard/listItems';
 import { useNavigate } from 'react-router-dom';
 import StickyHeadTable from './Stickyheadtable'; // Import the StickyHeadTable component
+import ShowBalance from './showbalance';
+import Grid from '@mui/material/Grid';
 
 function Copyright(props) {
   return (
@@ -46,7 +48,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#8B4513',
+  backgroundColor: '#5A2207',
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -83,7 +85,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
@@ -167,15 +168,30 @@ export default function Dashboard() {
         <Box
           component="main"
           sx={{
-            backgroundColor: '#FAEBD7',
             flexGrow: 1,
             height: '100vh',
             overflow: 'auto',
+            position: 'relative',
+            backgroundImage: 'url(/bggringgot.jpg)', // Replace with your image path
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 1,
           }}
         >
-          <Toolbar />
+         <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <StickyHeadTable />
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 4 }}>
+                  <ShowBalance />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 4 }}>
+                  <StickyHeadTable />
+                </Box>
+              </Grid>
+            </Grid>
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>

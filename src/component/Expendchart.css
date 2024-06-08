@@ -1,0 +1,22 @@
+.chart-container {
+    position: relative;
+    width: 700px; /* Adjust according to the desired width */
+    height: 500px; /* Adjust according to the desired height */
+  }
+  
+  .chart-container text {
+    pointer-events: none;
+  }
+  
+  .chart-container .label {
+    position: absolute;
+    font-size: 12px; /* Adjust the font size as needed */
+    text-align: center;
+    pointer-events: none;
+  }
+  
+  .chart-container .label-line {
+    stroke: #000;
+    stroke-width: 1px;
+  }
+  
