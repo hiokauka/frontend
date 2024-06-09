@@ -3,7 +3,7 @@ import { Typography, Grid, Select, MenuItem, Box } from '@mui/material';
 import axios from 'axios';
 
 const BalanceComponent = ({ height, width }) => {
-  const [selectedCurrency, setSelectedCurrency] = useState('Euro');
+  const [selectedCurrency, setSelectedCurrency] = useState('Knut');
   const [balances, setBalances] = useState({});
 
   useEffect(() => {
