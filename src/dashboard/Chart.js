@@ -1,77 +1,60 @@
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
-import { LineChart, axisClasses } from '@mui/x-charts';
-
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Box,
+} from '@mui/material';
 import Title from './Title';
 
-// Generate Sales Data
-function createData(time, amount) {
-  return { time, amount: amount ?? null };
+function createData(currency, exchangeRateUSD, exchangeRateEUR, exchangeRateMYR) {
+  return { currency, exchangeRateUSD, exchangeRateEUR, exchangeRateMYR };
 }
 
-const data = [
-  createData('00:00', 0),
-  createData('03:00', 300),
-  createData('06:00', 600),
-  createData('09:00', 800),
-  createData('12:00', 1500),
-  createData('15:00', 2000),
-  createData('18:00', 2400),
-  createData('21:00', 2400),
-  createData('24:00'),
+const rows = [
+  createData('USD', 1.0, 0.91, 4.35),
+  createData('EUR', 1.10, 1.0, 4.79),
+  createData('MYR', 0.23, 0.21, 1.0),
 ];
 
-export default function Chart() {
+export default function CurrencyComparisonTable() {
   const theme = useTheme();
 
   return (
     <React.Fragment>
-      <Title>Exchange Rate </Title>
-      <div style={{ width: '100%', flexGrow: 1, overflow: 'hidden' }}>
-        <LineChart
-          dataset={data}
-          margin={{
-            top: 16,
-            right: 20,
-            left: 70,
-            bottom: 30,
-          }}
-          xAxis={[
-            {
-              scaleType: 'point',
-              dataKey: 'time',
-              tickNumber: 2,
-              tickLabelStyle: theme.typography.body2,
-            },
-          ]}
-          yAxis={[
-            {
-              label: 'Sales ($)',
-              labelStyle: {
-                ...theme.typography.body1,
-                fill: theme.palette.text.primary,
-              },
-              tickLabelStyle: theme.typography.body2,
-              max: 2500,
-              tickNumber: 3,
-            },
-          ]}
-          series={[
-            {
-              dataKey: 'amount',
-              showMark: false,
-              color: theme.palette.primary.light,
-            },
-          ]}
-          sx={{
-            [`.${axisClasses.root} line`]: { stroke: theme.palette.text.secondary },
-            [`.${axisClasses.root} text`]: { fill: theme.palette.text.secondary },
-            [`& .${axisClasses.left} .${axisClasses.label}`]: {
-              transform: 'translateX(-25px)',
-            },
-          }}
-        />
-      </div>
+      <Title>Exchange Rate Comparison</Title>
+      <Box sx={{ width: '100%', overflow: 'auto' }}>
+        <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
+          <Table stickyHeader aria-label="currency comparison table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Currency</TableCell>
+                <TableCell align="right">Exchange Rate to USD</TableCell>
+                <TableCell align="right">Exchange Rate to EUR</TableCell>
+                <TableCell align="right">Exchange Rate to MYR</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.currency}>
+                  <TableCell component="th" scope="row">
+                    {row.currency}
+                  </TableCell>
+                  <TableCell align="right">{row.exchangeRateUSD}</TableCell>
+                  <TableCell align="right">{row.exchangeRateEUR}</TableCell>
+                  <TableCell align="right">{row.exchangeRateMYR}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </React.Fragment>
   );
 }

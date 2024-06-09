@@ -14,7 +14,7 @@ export default function Deposits() {
         on 15 March, 2019
       </Typography>
       <div>
-        <Link to="/balance" color="primary">
+        <Link to="/transactionshistory" color="primary">
           View balance
         </Link>
       </div>

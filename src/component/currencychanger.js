@@ -2,23 +2,40 @@ import React, { useState } from 'react';
 import { TextField, MenuItem, Button, Typography, Paper } from '@mui/material';
 
 const exchangeRates = {
-  MYR: { USD: 0.23, EUR: 0.21, MYR: 1 },
-  USD: { MYR: 4.35, EUR: 0.91, USD: 1 },
-  EUR: { MYR: 4.79, USD: 1.10, EUR: 1 },
+  MYR: { Knut: 0.23, Galleon: 0.21, Sickle: 1 },
+  USD: { Sickle: 4.35, Galleon: 0.91, Knut: 1 },
+  EUR: { Sickle: 4.79, Knut: 1.10, Galleon: 1 },
 };
 
-const currencies = ['MYR', 'USD', 'EUR'];
+const currencies = ['Sickle', 'Knut', 'Galleon'];
 
 const CurrencyChanger = () => {
   const [amount, setAmount] = useState('');
   const [fromCurrency, setFromCurrency] = useState('MYR');
   const [toCurrency, setToCurrency] = useState('USD');
   const [convertedAmount, setConvertedAmount] = useState(null);
+  const [balances, setBalances] = useState({
+    Sickle: 0,
+    Knut: 0,
+    Galleon: 0,
+  });
 
   const handleConvert = () => {
     if (amount && !isNaN(amount)) {
       const rate = exchangeRates[fromCurrency][toCurrency];
-      setConvertedAmount((amount * rate).toFixed(2));
+      const converted = parseFloat((amount * rate).toFixed(2));
+      setConvertedAmount(converted);
+    }
+  };
+
+  const handleAdd = () => {
+    if (convertedAmount !== null) {
+      const updatedBalances = { ...balances };
+      updatedBalances[toCurrency] += convertedAmount;
+      updatedBalances[fromCurrency] -= parseFloat(amount);
+      setBalances(updatedBalances);
+      setConvertedAmount(null);
+      setAmount('');
     }
   };
 
@@ -65,14 +82,27 @@ const CurrencyChanger = () => {
           </MenuItem>
         ))}
       </TextField>
-      <Button variant="contained" color="primary" onClick={handleConvert} sx={{ mt: 2 }}>
+      <Button variant="contained" color="primary" onClick={handleConvert} sx={{ mt: 2, mr: 1 }}>
         Convert
+      </Button>
+      <Button variant="contained" color="primary" onClick={handleAdd} sx={{ mt: 2 }}>
+        Add
       </Button>
       {convertedAmount !== null && (
         <Typography variant="h6" sx={{ mt: 2 }}>
           {amount} {fromCurrency} = {convertedAmount} {toCurrency}
         </Typography>
       )}
+      <Typography variant="body1" sx={{ mt: 2 }}>
+        Balances:
+      </Typography>
+      <ul>
+        {Object.entries(balances).map(([currency, balance]) => (
+          <li key={currency}>
+            {currency}: {balance}
+          </li>
+        ))}
+      </ul>
     </Paper>
   );
 };

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import LinkMUi from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,83 +8,51 @@ import Title from './Title';
 import { Link } from 'react-router-dom';
 
 // Generate Order Data
-function createData(id, date, name, Type, Status, amount) {
-  return { id, date, name, Type, Status, amount };
+function createData(id, date, paymentMethod, amount, currency) {
+  return { id, date, paymentMethod, amount, currency };
 }
 
 const rows = [
-  createData(
-    0,
-    '16 Mar, 2019',
-    'Elvis Presley',
-    'DuitNow QR',
-    'Pending',
-    312.44,
-  ),
-  createData(
-    1,
-    '16 Mar, 2019',
-    'Paul McCartney',
-    'DuitNow QR',
-    'Successful',
-    866.99,
-  ),
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 'Payment', 'DuitNow QR', 100.81),
-  createData(
-    3,
-    '16 Mar, 2019',
-    'Michael Jackson',
-    'DuitNow QR',
-    'Successful',
-    654.39,
-  ),
-  createData(
-    4,
-    '15 Mar, 2019',
-    'Bruce Springsteen',
-    'DuitNow QR',
-    'Successful',
-    212.79,
-  ),
+  createData(0, '16 Mar, 2019', 'Credit Card', 312.44, 'USD'),
+  createData(1, '16 Mar, 2019', 'Bank Transfer', 866.99, 'EUR'),
+  createData(2, '16 Mar, 2019', 'PayPal', 100.81, 'GBP'),
+  createData(3, '16 Mar, 2019', 'Credit Card', 654.39, 'USD'),
+  createData(4, '15 Mar, 2019', 'Bank Transfer', 212.79, 'EUR'),
 ];
-
-function preventDefault(event) {
-  event.preventDefault();
-}
 
 export default function Orders() {
   return (
     <React.Fragment>
-      <Title>Recent Orders</Title>
+      <Title>Recent Transactions</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
+            <TableCell>Transaction ID</TableCell>
             <TableCell>Date</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Type</TableCell>
-            <TableCell>Status</TableCell>
+            <TableCell>Payment Method</TableCell>
             <TableCell align="right">Amount</TableCell>
+            <TableCell>Currency</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id}>
+              <TableCell>{row.id}</TableCell>
               <TableCell>{row.date}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.Type}</TableCell>
-              <TableCell>{row.Status}</TableCell>
-              <TableCell align="right">{`$${row.amount}`}</TableCell>
+              <TableCell>{row.paymentMethod}</TableCell>
+              <TableCell align="right">{`$${row.amount.toFixed(2)}`}</TableCell>
+              <TableCell>{row.currency}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       <Link
-  color="primary"
-  to="/transactionshistory" 
-  sx={{ mt: 3 }}
->
-  See more transactions
-</Link>
+        color="primary"
+        to="/transactionshistory" 
+        sx={{ mt: 3 }}
+      >
+        See more transactions
+      </Link>
     </React.Fragment>
   );
 }

@@ -9,9 +9,9 @@ const BalanceComponent = ({ height, width }) => {
   };
 
   const balances = {
-    Euro: '€3,000',
-    USD: '$2,500',
-    MYR: 'RM10,000',
+    Euro: '3,000 Knut',
+    USD: '2,500 Sickle',
+    MYR: '10,000 Galleon',
   };
 
   return (

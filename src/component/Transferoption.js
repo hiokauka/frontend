@@ -109,9 +109,9 @@ class TransferOptions extends React.Component {
                 value={this.state.currency}
                 onChange={this.handleChange}
               >
-                <MenuItem value="USD">USD</MenuItem>
-                <MenuItem value="EUR">EUR</MenuItem>
-                <MenuItem value="GBP">GBP</MenuItem>
+                <MenuItem value="Knut">Knut</MenuItem>
+                <MenuItem value="Sickle">Sickle</MenuItem>
+                <MenuItem value="Galleon">Galleon</MenuItem>
                 {/* Add more currencies as needed */}
               </TextField>
             </Grid>

@@ -178,9 +178,11 @@ export default function SignInSide() {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleAdminDialogClose}>Cancel</Button>
-            <Button type="submit" variant="contained">
-              Sign In
-            </Button>
+            <Link to="/Admin" style={{ textDecoration: 'none' }}>
+  <Button variant="contained">
+    Sign In
+  </Button>
+</Link>
           </DialogActions>
         </Box>
       </Dialog>

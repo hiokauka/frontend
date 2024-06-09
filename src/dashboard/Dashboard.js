@@ -100,6 +100,7 @@ export default function Dashboard() {
     setOpen(!open);
   };
 
+  
   const handleLogout = () => {
     // Add your logout logic here
     console.log('Logout confirmed');
