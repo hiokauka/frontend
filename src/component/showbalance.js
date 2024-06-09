@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, Grid, Select, MenuItem, Box } from '@mui/material';
+import axios from 'axios';
 
 const BalanceComponent = ({ height, width }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('Euro');

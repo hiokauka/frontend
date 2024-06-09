@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Grid, Box, Typography, Container, MenuItem, Select, InputLabel, FormControl, Snackbar } from '@mui/material';
+import {
+  Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Grid, Box, Typography, Container, MenuItem, Select, InputLabel, FormControl, Snackbar
+} from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import MuiAlert from '@mui/material/Alert';
+import axios from 'axios';
 
 const defaultTheme = createTheme();
 
@@ -13,10 +16,13 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function SignUp() {
   const [open, setOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
+
     const accountDTO = {
       role: formData.get('role'),
       fullName: formData.get('fullName'),
@@ -38,10 +44,26 @@ export default function SignUp() {
       securityPIN: formData.get('securityPIN')
     };
 
+    // Form validation
+    const errors = {};
+    for (const [key, value] of formData.entries()) {
+      if (!value) {
+        errors[key] = 'This field is required';
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    } else {
+      setFormErrors({});
+    }
+
     try {
       const response = await axios.post('http://localhost:8080/signup/account', accountDTO);
       console.log(response.data); // Handle successful registration
       setOpen(true);
+      navigate('/signin');
     } catch (error) {
       console.error('Error:', error); // Handle registration error
     }
@@ -83,22 +105,24 @@ export default function SignUp() {
                   id="fullName"
                   label="Full Name"
                   autoFocus
+                  error={!!formErrors.fullName}
+                  helperText={formErrors.fullName}
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth>
+                <FormControl fullWidth required error={!!formErrors.gender}>
                   <InputLabel id="gender-label">Gender</InputLabel>
                   <Select
                     labelId="gender-label"
                     id="gender"
                     name="gender"
-                    required
                     label="Gender"
                   >
                     <MenuItem value="male">Male</MenuItem>
                     <MenuItem value="female">Female</MenuItem>
                     <MenuItem value="other">Other</MenuItem>
                   </Select>
+                  {formErrors.gender && <Typography color="error">{formErrors.gender}</Typography>}
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
@@ -110,6 +134,8 @@ export default function SignUp() {
                   name="dateOfBirth"
                   type="date"
                   InputLabelProps={{ shrink: true }}
+                  error={!!formErrors.dateOfBirth}
+                  helperText={formErrors.dateOfBirth}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -119,6 +145,8 @@ export default function SignUp() {
                   id="streetName1"
                   label="Street Name 1"
                   name="streetName1"
+                  error={!!formErrors.streetName1}
+                  helperText={formErrors.streetName1}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -136,6 +164,8 @@ export default function SignUp() {
                   id="town"
                   label="Town"
                   name="town"
+                  error={!!formErrors.town}
+                  helperText={formErrors.town}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -145,6 +175,8 @@ export default function SignUp() {
                   id="state"
                   label="State"
                   name="state"
+                  error={!!formErrors.state}
+                  helperText={formErrors.state}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -154,6 +186,8 @@ export default function SignUp() {
                   id="postcode"
                   label="Postcode"
                   name="postcode"
+                  error={!!formErrors.postcode}
+                  helperText={formErrors.postcode}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -163,15 +197,19 @@ export default function SignUp() {
                   id="country"
                   label="Country"
                   name="country"
+                  error={!!formErrors.country}
+                  helperText={formErrors.country}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  id="userImage"
+                  id="userImageURL"
                   label="User Image URL"
-                  name="userImage"
+                  name="userImageURL"
+                  error={!!formErrors.userImageURL}
+                  helperText={formErrors.userImageURL}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -182,6 +220,8 @@ export default function SignUp() {
                   label="Email Address"
                   name="emailAddress"
                   autoComplete="email"
+                  error={!!formErrors.emailAddress}
+                  helperText={formErrors.emailAddress}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -191,6 +231,8 @@ export default function SignUp() {
                   id="username"
                   label="Username"
                   name="username"
+                  error={!!formErrors.username}
+                  helperText={formErrors.username}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -202,6 +244,8 @@ export default function SignUp() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                  error={!!formErrors.password}
+                  helperText={formErrors.password}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -211,22 +255,24 @@ export default function SignUp() {
                   id="telephoneNumber"
                   label="Telephone Number"
                   name="telephoneNumber"
+                  error={!!formErrors.telephoneNumber}
+                  helperText={formErrors.telephoneNumber}
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth>
+                <FormControl fullWidth required error={!!formErrors.securityQuestionID}>
                   <InputLabel id="securityQuestion-label">Security Question</InputLabel>
                   <Select
                     labelId="securityQuestion-label"
-                    id="securityQuestion"
-                    name="securityQuestion"
-                    required
+                    id="securityQuestionID"
+                    name="securityQuestionID"
                     label="Security Question"
                   >
-                    <MenuItem value="question1">Question 1</MenuItem>
-                    <MenuItem value="question2">Question 2</MenuItem>
-                    <MenuItem value="question3">Question 3</MenuItem>
+                    <MenuItem value="question1">Name of your first love</MenuItem>
+                    <MenuItem value="question2">Name of your mother</MenuItem>
+                    <MenuItem value="question3">Name of your favourite animal</MenuItem>
                   </Select>
+                  {formErrors.securityQuestionID && <Typography color="error">{formErrors.securityQuestionID}</Typography>}
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
@@ -236,58 +282,60 @@ export default function SignUp() {
                   id="securityAnswer"
                   label="Security Answer"
                   name="securityAnswer"
+                  error={!!formErrors.securityAnswer}
+                  helperText={formErrors.securityAnswer}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                 
                   id="securityPIN"
                   label="Security PIN"
                   name="securityPIN"
                   type="password"
-                  />
-                  </Grid>
-                
-                  <Grid item xs={12}>
-                  <FormControlLabel
+                  error={!!formErrors.securityPIN}
+                  helperText={formErrors.securityPIN}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
                   control={<Checkbox value="allowExtraEmails" color="primary" />}
                   label="I want to receive inspiration, marketing promotions and updates via email."
-                  />
-                  </Grid>
-                  </Grid>
-                  <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                  >
-                  Sign Up
-                  </Button>
-                  <Grid container justifyContent="flex-end">
-                  <Grid item>
-                  <RouterLink to="/signin" variant="body2">
+                />
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign Up
+            </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <RouterLink to="/signin" variant="body2">
                   Already have an account? Sign in
-                  </RouterLink >
-                  </Grid>
-                  </Grid>
-                  </Box>
-                  </Box>
-                  <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-                  <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
-                  Sign up successful!
-                  </Alert>
-                  </Snackbar>
-                  <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 5 }}>
-                  {'Copyright © '}
-                  <RouterLink color="inherit" href="https://mui.com/">
-                  Your Website
-                  </RouterLink >{' '}
-                  {new Date().getFullYear()}
-                  {'.'}
-                  </Typography>
-                  </Container>
-                  </ThemeProvider>
-                  );
-                  }
+                </RouterLink>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
+            Sign up successful!
+          </Alert>
+        </Snackbar>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 5 }}>
+          {'Copyright © '}
+          <RouterLink color="inherit" href="https://mui.com/">
+            Your Website
+          </RouterLink> {' '}
+          {new Date().getFullYear()}
+          {'.'}
+        </Typography>
+      </Container>
+    </ThemeProvider>
+  );
+}

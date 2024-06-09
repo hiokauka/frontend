@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -7,7 +7,6 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import axios from 'axios';
-
 
 export default function ExpensePieChart() {
   const [month, setMonth] = useState('January');
@@ -31,8 +30,15 @@ export default function ExpensePieChart() {
     setMonth(event.target.value);
   };
 
-  const selectedData = expensesData[month] || [];
-  const totalExpenses = selectedData.reduce((total, expense) => total + expense.value, 0);
+  // Safely access the selected data and ensure arrays exist
+  const selectedData = expensesData[month] || { sickle: [], knut: [], galleon: [] };
+
+  // Calculate total expenses for each category
+  const totalExpenses = {
+    sickle: selectedData.sickle.reduce((total, expense) => total + expense.value, 0),
+    knut: selectedData.knut.reduce((total, expense) => total + expense.value, 0),
+    galleon: selectedData.galleon.reduce((total, expense) => total + expense.value, 0)
+  };
 
   return (
     <Box
@@ -59,6 +65,7 @@ export default function ExpensePieChart() {
           ))}
         </Select>
       </FormControl>
+
       {/* Sickle Expenses Chart */}
       <PieChart
         series={[
@@ -78,7 +85,7 @@ export default function ExpensePieChart() {
       <Typography variant="h6" align="center" sx={{ mt: 4 }}>
         Total Expenses (Sickle): {totalExpenses.sickle}
       </Typography>
-      
+
       {/* Knut Expenses Chart */}
       <PieChart
         series={[
@@ -98,7 +105,7 @@ export default function ExpensePieChart() {
       <Typography variant="h6" align="center" sx={{ mt: 4 }}>
         Total Expenses (Knut): {totalExpenses.knut}
       </Typography>
-      
+
       {/* Galleon Expenses Chart */}
       <PieChart
         series={[

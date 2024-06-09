@@ -1,28 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import axios from 'axios';
 
 export default function Statistics() {
-    const [statisticsData, setStatisticsData] = useState({
-      totalUsers: null,
-      transactionsPerDay: null,
-      revenueThisMonth: null,
-    });
-  
-    useEffect(() => {
-      const fetchStatisticsData = async () => {
-        try {
-          const response = await axios.get('http://localhost:8080/accounts/count');
-          setStatisticsData(response.data);
-        } catch (error) {
-          console.error('Error fetching statistics data:', error);
-        }
-      };
-  
-      fetchStatisticsData();
-    }, []);
-  
+  const [statisticsData, setStatisticsData] = useState({
+    totalUsers: null,
+    transactionsPerDay: null,
+    revenueThisMonth: null,
+  });
+
+  useEffect(() => {
+    const fetchStatisticsData = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/accounts/count');
+        setStatisticsData(response.data);
+      } catch (error) {
+        console.error('Error fetching statistics data:', error);
+      }
+    };
+
+    fetchStatisticsData();
+  }, []);
 
   return (
     <Grid container spacing={3}>
@@ -32,7 +32,7 @@ export default function Statistics() {
           <Typography variant="h6" gutterBottom>
             Total Users
           </Typography>
-          <Typography variant="h4">{totalUsers}</Typography>
+          <Typography variant="h4">{statisticsData.totalUsers}</Typography>
         </Paper>
       </Grid>
 
@@ -42,7 +42,7 @@ export default function Statistics() {
           <Typography variant="h6" gutterBottom>
             Transactions per Day
           </Typography>
-          <Typography variant="h4">{transactionsPerDay}</Typography>
+          <Typography variant="h4">{statisticsData.transactionsPerDay}</Typography>
         </Paper>
       </Grid>
 
@@ -52,7 +52,7 @@ export default function Statistics() {
           <Typography variant="h6" gutterBottom>
             Revenue This Month
           </Typography>
-          <Typography variant="h4">${revenueThisMonth}</Typography>
+          <Typography variant="h4">${statisticsData.revenueThisMonth}</Typography>
         </Paper>
       </Grid>
 

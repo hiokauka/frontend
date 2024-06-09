@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Grid, Typography, TextField, Button, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
