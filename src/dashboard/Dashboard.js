@@ -94,7 +94,19 @@ const defaultTheme = createTheme();
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [username, setUsername] = React.useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch user data when component mounts
+    axios.get('http://localhost:8080/accounts/{accountId}/username')
+      .then(response => {
+        setUsername(response.data.username);
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+  }, []);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -145,7 +157,7 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Welcome, user
+               Welcome, {username} 
             </Typography>
             <Button color="inherit" onClick={handleDialogOpen}>
               Logout

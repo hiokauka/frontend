@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -6,21 +6,23 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 import { Link } from 'react-router-dom';
-
-// Generate Order Data
-function createData(id, date, paymentMethod, amount, currency) {
-  return { id, date, paymentMethod, amount, currency };
-}
-
-const rows = [
-  createData(0, '16 Mar, 2019', 'Credit Card', 312.44, 'USD'),
-  createData(1, '16 Mar, 2019', 'Bank Transfer', 866.99, 'EUR'),
-  createData(2, '16 Mar, 2019', 'PayPal', 100.81, 'GBP'),
-  createData(3, '16 Mar, 2019', 'Credit Card', 654.39, 'USD'),
-  createData(4, '15 Mar, 2019', 'Bank Transfer', 212.79, 'EUR'),
-];
+import axios from 'axios'; // Import Axios for HTTP requests
 
 export default function Orders() {
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    // Fetch data from the backend
+    axios.get('https://localhost:8080/transactions/{accountId}')
+      .then(response => {
+        // Assuming the response data structure matches what we need
+        setRows(response.data);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the transactions!', error);
+      });
+  }, []);
+
   return (
     <React.Fragment>
       <Title>Recent Transactions</Title>
@@ -48,7 +50,7 @@ export default function Orders() {
       </Table>
       <Link
         color="primary"
-        to="/transactionshistory" 
+        to="/transactionshistory"
         sx={{ mt: 3 }}
       >
         See more transactions

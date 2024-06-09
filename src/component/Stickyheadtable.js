@@ -24,22 +24,25 @@ const columns = [
   { id: 'Download Receipt', label: 'Download Receipt', minWidth: 170, align: 'right' },
 ];
 
-function createData(ref, date, from, to, paymentMethod, cardNumber, amount, currency, category) {
-  return { 'Transaction ID': ref, 'Date': date, 'From': from, 'To': to, 'Payment Method': paymentMethod, 'Card Number': cardNumber, 'Amount': amount, 'Currency': currency, 'Category': category };
-}
-
-const rows = [
-  createData('REF001', '2024-06-10', 'Alice', 'Bob', 'Online Banking', '', 1500.75, 'Sickle', 'Transfer'),
-  createData('REF002', '2024-06-11', 'Charlie', 'Dave', 'Card', '1234 5678 9012 3456', 200.50, 'Knut', 'Payment'),
-  createData('REF003', '2024-06-12', 'Eve', 'Frank', 'Online Banking', '', 3000.00, 'Galleon', 'Withdrawal'),
-  createData('REF004', '2024-06-13', 'Grace', 'Heidi', 'Card', '9876 5432 1098 7654', 250.25, 'Knut', 'Deposit'),
-  createData('REF005', '2024-06-14', 'Ivan', 'Judy', 'Card', '1111 2222 3333 4444', 500.00, 'Knut', 'Transfer'),
-];
 
 export default function StickyHeadTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    // Fetch transaction data from the backend when the component mounts
+    const fetchTransactions = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/transactions/{accountId}');
+        setTransactions(response.data);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+      }
+    };
+    fetchTransactions();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -54,11 +57,12 @@ export default function StickyHeadTable() {
     setSearchQuery(event.target.value);
   };
 
-  const filteredRows = rows.filter((row) =>
+  const filteredRows = transactions.filter((row) =>
     Object.values(row).some((value) =>
       value.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
   );
+
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', padding: 2 }}>

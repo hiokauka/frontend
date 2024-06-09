@@ -18,30 +18,50 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from 'axios';
 
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
   const [adminDialogOpen, setAdminDialogOpen] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const formData = new FormData(event.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    
+    try {
+      const response = await axios.post('http://localhost:8080/signin/auth', {
+        username, // use username instead of email in login < < < <
+        password,
+      });
+      console.log(response.data); // Handle successful login
+    } catch (error) {
+      console.error('Error:', error); // Handle login error
+    }
   };
 
-  const handleAdminSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('username'),
-      password: data.get('password'),
+
+const handleAdminSubmit = async (event) => {
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const username = formData.get('username');
+  const password = formData.get('password');
+
+// Actually, the way i implemented it makes it so that both user and admin can log in at the same login button (user login). If the account’s role in the database is Goblin, it goes to admin, else, it goes to /dashboard (for any of the 3 user classes)
+
+  try {
+    const response = await axios.post('http://localhost:8080/signin/auth', {
+      username,
+      password,
     });
-    // Add logic to handle admin login here
-  };
+    console.log(response.data); // Handle successful admin login
+  } catch (error) {
+    console.error('Error:', error); // Handle admin login error
+  }
+};
+
 
   const handleAdminDialogOpen = () => {
     setAdminDialogOpen(true);

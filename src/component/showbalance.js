@@ -3,16 +3,27 @@ import { Typography, Grid, Select, MenuItem, Box } from '@mui/material';
 
 const BalanceComponent = ({ height, width }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('Euro');
+  const [balances, setBalances] = useState({});
+
+  useEffect(() => {
+    // Fetch balances from backend upon component mount
+    fetchBalances();
+  }, []);
+
+  const fetchBalances = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/balances/{accountId}/{currencyId}');
+      setBalances(response.data);
+    } catch (error) {
+      console.error('Error fetching balances:', error);
+      // Handle error: display error message or redirect to error page
+    }
+  };
 
   const handleCurrencyChange = (event) => {
     setSelectedCurrency(event.target.value);
   };
 
-  const balances = {
-    Euro: '3,000 Knut',
-    USD: '2,500 Sickle',
-    MYR: '10,000 Galleon',
-  };
 
   return (
     <Box

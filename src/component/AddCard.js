@@ -13,6 +13,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -22,18 +23,26 @@ function AddCard() {
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      account: data.get('account'),
-      type: data.get('type'),
-      cardNumber: data.get('cardNumber'),
-      cvv: data.get('cvv'),
-      expiryDate: data.get('expiryDate'),
-    });
-    setOpenSnackbar(true); // Open Snackbar
-    navigate('/dashboard'); // Redirect to dashboard
+    const formData = new FormData(event.target);
+
+    try {
+      const response = await axios.post('http://localhost:8080/cards/add', {
+        account: formData.get('account'),
+        type: formData.get('type'),
+        cardNumber: formData.get('cardNumber'),
+        cvv: formData.get('cvv'),
+        expiryDate: formData.get('expiryDate'),
+      });
+
+      console.log('Card added:', response.data);
+      setOpenSnackbar(true); // Open Snackbar
+      navigate('/dashboard'); // Redirect to dashboard
+    } catch (error) {
+      console.error('Error adding card:', error);
+      // Handle error: display error message or redirect to error page
+    }
   };
 
   const handleSnackbarClose = () => {

@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
 import { TextField, MenuItem, Button, Typography, Paper } from '@mui/material';
-
-const exchangeRates = {
-  MYR: { Knut: 0.23, Galleon: 0.21, Sickle: 1 },
-  USD: { Sickle: 4.35, Galleon: 0.91, Knut: 1 },
-  EUR: { Sickle: 4.79, Knut: 1.10, Galleon: 1 },
-};
+import axios from 'axios';
 
 const currencies = ['Sickle', 'Knut', 'Galleon'];
 
 const CurrencyChanger = () => {
   const [amount, setAmount] = useState('');
-  const [fromCurrency, setFromCurrency] = useState('MYR');
-  const [toCurrency, setToCurrency] = useState('USD');
+  const [fromCurrency, setFromCurrency] = useState('Sickle');
+  const [toCurrency, setToCurrency] = useState('Knut');
   const [convertedAmount, setConvertedAmount] = useState(null);
   const [balances, setBalances] = useState({
     Sickle: 0,
@@ -20,22 +15,51 @@ const CurrencyChanger = () => {
     Galleon: 0,
   });
 
-  const handleConvert = () => {
+  const handleConvert = async () => {
     if (amount && !isNaN(amount)) {
-      const rate = exchangeRates[fromCurrency][toCurrency];
-      const converted = parseFloat((amount * rate).toFixed(2));
-      setConvertedAmount(converted);
+      try {
+        const exchangeRequestDTO = {
+          amount: parseFloat(amount),
+          fromCurrency,
+          toCurrency,
+        };
+        const response = await axios.post('http://localhost:8080/exchange/convert', exchangeRequestDTO);
+        const convertedAmount = response.data.convertedAmount.toFixed(2);
+        setConvertedAmount(convertedAmount);
+      } catch (error) {
+        console.error('Error fetching exchange rates:', error);
+      }
     }
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (convertedAmount !== null) {
-      const updatedBalances = { ...balances };
-      updatedBalances[toCurrency] += convertedAmount;
-      updatedBalances[fromCurrency] -= parseFloat(amount);
-      setBalances(updatedBalances);
-      setConvertedAmount(null);
-      setAmount('');
+      const newBalances = { ...balances };
+      const newToBalance = newBalances[toCurrency] + parseFloat(convertedAmount);
+      const newFromBalance = newBalances[fromCurrency] - parseFloat(amount);
+      if (newFromBalance >= 0) {
+        newBalances[toCurrency] = newToBalance;
+        newBalances[fromCurrency] = newFromBalance;
+        setBalances(newBalances);
+        setConvertedAmount(null);
+        setAmount('');
+
+        // Simulate backend API call to update balances
+        try {
+          const processExchangeRequestDTO = {
+            fromCurrency,
+            toCurrency,
+            amount: parseFloat(amount),
+            convertedAmount: parseFloat(convertedAmount),
+          };
+          await axios.post('http://localhost:8080/exchange/process', processExchangeRequestDTO);
+          console.log('Balances updated successfully.');
+        } catch (error) {
+          console.error('Error updating balances:', error);
+        }
+      } else {
+        alert('Insufficient balance.');
+      }
     }
   };
 

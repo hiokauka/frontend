@@ -13,38 +13,60 @@ const ForgotPasswordPage = () => {
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [errorText, setErrorText] = useState('');
 
-  const handlePhoneNumberSubmit = () => {
-    if (phoneNumber.trim() !== '') {
-      setSecurityQuestion('What is your pet\'s name?');
+  const handlePhoneNumberSubmit = async () => {
+    try {
+      const response = await axios.post('http://your-backend-url/api/forgot-password', {
+        phoneNumber: phoneNumber.trim(),
+      });
+      if (response.data.securityQuestion) {
+        setSecurityQuestion(response.data.securityQuestion);
+      }
+    } catch (error) {
+      console.error('Error submitting phone number:', error);
+      // Handle error: display error message or redirect to error page
     }
   };
 
-  const handleSecurityQuestionSubmit = () => {
-    const isCorrect = answer.toLowerCase() === 'dummy';
-    setIsSecurityQuestionCorrect(isCorrect);
-    if (isCorrect) {
-      setNewPassword('');
-      setConfirmPassword('');
+  const handleSecurityQuestionSubmit = async () => {
+    try {
+      const response = await axios.post('http://your-backend-url/api/validate-security-question', {
+        answer: answer.trim().toLowerCase(),
+      });
+      setIsSecurityQuestionCorrect(response.data.isCorrect);
+      if (response.data.isCorrect) {
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    } catch (error) {
+      console.error('Error submitting security question answer:', error);
+      // Handle error: display error message or redirect to error page
     }
   };
 
-  const handlePasswordReset = () => {
+  const handlePasswordReset = async () => {
     if (newPassword !== confirmPassword) {
       setErrorText('Confirmation password does not match.');
       return;
     }
 
-    // Reset password logic here
-    console.log('New Password:', newPassword);
-    setIsSnackbarOpen(true);
-    setTimeout(() => {
-      navigate('/signin');
-    }, 3000);
+    try {
+      await axios.post('http://your-backend-url/api/reset-password', {
+        newPassword: newPassword.trim(),
+      });
+      setIsSnackbarOpen(true);
+      setTimeout(() => {
+        navigate('/signin');
+      }, 3000);
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      // Handle error: display error message or redirect to error page
+    }
   };
 
   const handleSnackbarClose = () => {
     setIsSnackbarOpen(false);
   };
+
 
   return (
     <Grid container spacing={2} justifyContent="center" alignItems="center">

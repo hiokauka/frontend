@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, TextField, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const SettingsComponent = () => {
   const [fullName, setFullName] = useState('');
@@ -14,22 +15,74 @@ const SettingsComponent = () => {
     postcode: '',
     country: '',
   });
-  const [userImage, setUserImage] = useState('');
+  const [userImageURL, setUserImageURL] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [telephoneNumber, setTelephoneNumber] = useState('');
-  const [securityQuestion, setSecurityQuestion] = useState('');
+  const [securityQuestionID, setSecurityQuestionID] = useState('');
   const [securityAnswer, setSecurityAnswer] = useState('');
   const [securityPIN, setSecurityPIN] = useState('');
-  
-  const handleSaveChanges = () => {
-    // Logic to save changes to the backend
-    console.log('Changes saved successfully!');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/accounts/{accountId}/settings');
+        const userData = response.data;
+
+        // Update state with fetched data
+        setFullName(userData.fullName);
+        setGender(userData.gender);
+        setDateOfBirth(userData.dateOfBirth);
+        setAddress({
+          streetName1: userData.streetName1,
+          streetName2: userData.streetName2,
+          town: userData.town,
+          state: userData.state,
+          postcode: userData.postcode,
+          country: userData.country,
+        });
+        setUserImageURL(userData.userImageURL);
+        setEmailAddress(userData.emailAddress);
+        setUsername(userData.username);
+        setPassword(userData.password);
+        setTelephoneNumber(userData.telephoneNumber);
+        setSecurityQuestionID(userData.securityQuestionID);
+        setSecurityAnswer(userData.securityAnswer);
+        setSecurityPIN(userData.securityPIN);
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const handleSaveChanges = async () => {
+    const updatedData = {
+      fullName,
+      gender,
+      dateOfBirth,
+      ...address,
+      userImageURL,
+      emailAddress,
+      username,
+      password,
+      telephoneNumber,
+      securityQuestionID,
+      securityAnswer,
+      securityPIN,
+    };
+
+    try {
+      await axios.put('http://localhost:8080/accounts/{accountId}/settings', updatedData);
+      console.log('Changes saved successfully!');
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
   };
 
   const handleAddCard = () => {
-    // Logic to handle adding a new card
     console.log('Add card clicked!');
   };
 
@@ -42,7 +95,7 @@ const SettingsComponent = () => {
         onChange={(e) => setFullName(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Gender"
@@ -50,7 +103,7 @@ const SettingsComponent = () => {
         onChange={(e) => setGender(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Date of Birth"
@@ -59,7 +112,8 @@ const SettingsComponent = () => {
         onChange={(e) => setDateOfBirth(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        InputLabelProps={{ shrink: true }}
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Street Name 1"
@@ -67,7 +121,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, streetName1: e.target.value })}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Street Name 2"
@@ -75,7 +129,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, streetName2: e.target.value })}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Town"
@@ -83,7 +137,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, town: e.target.value })}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="State"
@@ -91,7 +145,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, state: e.target.value })}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Postcode"
@@ -99,7 +153,7 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, postcode: e.target.value })}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Country"
@@ -107,15 +161,15 @@ const SettingsComponent = () => {
         onChange={(e) => setAddress({ ...address, country: e.target.value })}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Profile Image URL"
-        value={userImage}
-        onChange={(e) => setUserImage(e.target.value)}
+        value={userImageURL}
+        onChange={(e) => setUserImageURL(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Email Address"
@@ -123,7 +177,7 @@ const SettingsComponent = () => {
         onChange={(e) => setEmailAddress(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Username"
@@ -131,7 +185,7 @@ const SettingsComponent = () => {
         onChange={(e) => setUsername(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Password"
@@ -140,7 +194,7 @@ const SettingsComponent = () => {
         onChange={(e) => setPassword(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Telephone Number"
@@ -148,15 +202,15 @@ const SettingsComponent = () => {
         onChange={(e) => setTelephoneNumber(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
-        label="Security Question"
-        value={securityQuestion}
-        onChange={(e) => setSecurityQuestion(e.target.value)}
+        label="Security Question ID"
+        value={securityQuestionID}
+        onChange={(e) => setSecurityQuestionID(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Security Answer"
@@ -164,7 +218,7 @@ const SettingsComponent = () => {
         onChange={(e) => setSecurityAnswer(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <TextField
         label="Security PIN"
@@ -173,7 +227,7 @@ const SettingsComponent = () => {
         onChange={(e) => setSecurityPIN(e.target.value)}
         fullWidth
         margin="normal"
-        sx={{ backgroundColor: 'white' }} // Set background color to white
+        sx={{ backgroundColor: 'white' }}
       />
       <Link to="/Addcard" color="inherit" underline="none">
         <Button variant="contained" color="primary" sx={{ mt: 2, mr: 2 }}>

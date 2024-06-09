@@ -13,41 +13,38 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 export default function SignUp() {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      user: {
-        fullName: data.get('fullName'),
-        gender: data.get('gender'),
-        dateOfBirth: data.get('dateOfBirth'),
-        address: {
-          streetName1: data.get('streetName1'),
-          streetName2: data.get('streetName2'),
-          town: data.get('town'),
-          state: data.get('state'),
-          postcode: data.get('postcode'),
-          country: data.get('country'),
-        },
-        userImage: data.get('userImage'),
-        emailAddress: data.get('emailAddress'),
-        username: data.get('username'),
-        password: data.get('password'),
-        telephoneNumber: data.get('telephoneNumber'),
-        securityQuestion: data.get('securityQuestion'),
-        securityAnswer: data.get('securityAnswer'),
-        securityPIN: data.get('securityPIN'),
-        cardNumber: data.get('cardNumber'),
-      }
-    });
+    const formData = new FormData(event.target);
+    const accountDTO = {
+      role: formData.get('role'),
+      fullName: formData.get('fullName'),
+      gender: formData.get('gender'),
+      dateOfBirth: formData.get('dateOfBirth'),
+      streetName1: formData.get('streetName1'),
+      streetName2: formData.get('streetName2'),
+      town: formData.get('town'),
+      state: formData.get('state'),
+      postcode: formData.get('postcode'),
+      country: formData.get('country'),
+      userImageURL: formData.get('userImageURL'),
+      emailAddress: formData.get('emailAddress'),
+      username: formData.get('username'),
+      password: formData.get('password'),
+      telephoneNumber: formData.get('telephoneNumber'),
+      securityQuestionID: formData.get('securityQuestionID'),
+      securityAnswer: formData.get('securityAnswer'),
+      securityPIN: formData.get('securityPIN')
+    };
 
-    // Show notification and navigate to the dashboard
-    setOpen(true);
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 2000); // 2 seconds delay to show notification
+    try {
+      const response = await axios.post('http://localhost:8080/signup/account', accountDTO);
+      console.log(response.data); // Handle successful registration
+      setOpen(true);
+    } catch (error) {
+      console.error('Error:', error); // Handle registration error
+    }
   };
 
   const handleClose = (event, reason) => {

@@ -6,53 +6,33 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import axios from 'axios';
 
-const expensesData = {
-  January: {
-    sickle: [
-      { id: 0, value: 30, label: 'Food' },
-      { id: 1, value: 25, label: 'Entertainment' },
-      { id: 2, value: 20, label: 'Utilities' },
-      { id: 3, value: 25, label: 'Rent' },
-      { id: 4, value: 15, label: 'Transportation' },
-      { id: 5, value: 10, label: 'Healthcare' },
-      { id: 6, value: 5, label: 'Education' },
-    ],
-    knut: [
-      { id: 0, value: 100, label: 'Food' },
-      { id: 1, value: 50, label: 'Entertainment' },
-      { id: 2, value: 30, label: 'Utilities' },
-      { id: 3, value: 80, label: 'Rent' },
-      { id: 4, value: 40, label: 'Transportation' },
-      { id: 5, value: 20, label: 'Healthcare' },
-      { id: 6, value: 10, label: 'Education' },
-    ],
-    galleon: [
-      { id: 0, value: 500, label: 'Food' },
-      { id: 1, value: 200, label: 'Entertainment' },
-      { id: 2, value: 150, label: 'Utilities' },
-      { id: 3, value: 300, label: 'Rent' },
-      { id: 4, value: 100, label: 'Transportation' },
-      { id: 5, value: 50, label: 'Healthcare' },
-      { id: 6, value: 20, label: 'Education' },
-    ],
-  },
-  // Add expenses data for other months if needed
-};
 
 export default function ExpensePieChart() {
   const [month, setMonth] = useState('January');
+  const [expensesData, setExpensesData] = useState({});
+
+  useEffect(() => {
+    const fetchExpensesData = async () => {
+      try {
+        // Fetch expenses data from the backend
+        const response = await axios.get('http://localhost:8080/transactions/{accountId}');
+        setExpensesData(response.data);
+      } catch (error) {
+        console.error('Error fetching expenses data:', error);
+      }
+    };
+
+    fetchExpensesData();
+  }, []);
 
   const handleMonthChange = (event) => {
     setMonth(event.target.value);
   };
 
-  const selectedData = expensesData[month] || {};
-  const totalExpenses = {
-    sickle: selectedData.sickle.reduce((total, expense) => total + expense.value, 0),
-    knut: selectedData.knut.reduce((total, expense) => total + expense.value, 0),
-    galleon: selectedData.galleon.reduce((total, expense) => total + expense.value, 0),
-  };
+  const selectedData = expensesData[month] || [];
+  const totalExpenses = selectedData.reduce((total, expense) => total + expense.value, 0);
 
   return (
     <Box

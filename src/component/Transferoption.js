@@ -13,6 +13,7 @@ import {
   DialogActions,
   Snackbar,
 } from '@mui/material';
+import axios from 'axios';
 
 class TransferOptions extends React.Component {
   constructor(props) {
@@ -27,28 +28,52 @@ class TransferOptions extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.fetchPin();
+  }
+
+  fetchPin = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080'); // Replace with your actual API endpoint
+      this.setState({ fetchedPin: response.data.pin });
+    } catch (error) {
+      console.error('Error fetching the PIN:', error);
+    }
+  };
+
   handleChange = (event) => {
     const { name, value } = event.target;
     this.setState({ [name]: value });
   };
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault();
-    // Mocking pin validation
-    if (this.state.pin !== '1234') {
+    const { pin, fetchedPin } = this.state;
+    
+    if (pin !== fetchedPin) {
       alert('Invalid PIN');
       return;
     }
-    // Handle form submission logic here
-    console.log('Form submitted:', this.state);
-    // Reset form fields
-    this.setState({
-      amount: '',
-      currency: '',
-      searchQuery: '',
-      pin: '',
-      successDialogOpen: true,
-    });
+
+    const transferData = {
+      amount: this.state.amount,
+      currency: this.state.currency,
+      searchQuery: this.state.searchQuery,
+    };
+
+    try {
+      const response = await axios.post('https://your-backend-api.com/transfer', transferData); // Replace with your actual API endpoint
+      console.log('Form submitted:', response.data);
+      this.setState({
+        amount: '',
+        currency: '',
+        searchQuery: '',
+        pin: '',
+        successDialogOpen: true,
+      });
+    } catch (error) {
+      console.error('There was an error submitting the form:', error);
+    }
   };
 
   handleSuccessDialogClose = () => {
@@ -56,7 +81,6 @@ class TransferOptions extends React.Component {
   };
 
   handlePrintReceipt = () => {
-    // Implement printing receipt logic here
     console.log('Printing receipt...');
   };
 

@@ -4,10 +4,25 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 
 export default function Statistics() {
-  // Example data (replace with real data)
-  const totalUsers = 1000;
-  const transactionsPerDay = 500;
-  const revenueThisMonth = 10000;
+    const [statisticsData, setStatisticsData] = useState({
+      totalUsers: null,
+      transactionsPerDay: null,
+      revenueThisMonth: null,
+    });
+  
+    useEffect(() => {
+      const fetchStatisticsData = async () => {
+        try {
+          const response = await axios.get('http://localhost:8080/accounts/count');
+          setStatisticsData(response.data);
+        } catch (error) {
+          console.error('Error fetching statistics data:', error);
+        }
+      };
+  
+      fetchStatisticsData();
+    }, []);
+  
 
   return (
     <Grid container spacing={3}>
