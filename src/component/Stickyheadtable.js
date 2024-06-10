@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,6 +10,8 @@ import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem'; // Import MenuItem
+import Grid from '@mui/material/Grid'; // Import Grid
 import axios from 'axios';
 
 const columns = [
@@ -25,15 +27,17 @@ const columns = [
   { id: 'Download Receipt', label: 'Download Receipt', minWidth: 170, align: 'right' },
 ];
 
-
 export default function StickyHeadTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
   const [transactions, setTransactions] = useState([]);
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
+  const [sortColumn, setSortColumn] = useState('');
+  const [sortDirection, setSortDirection] = useState('');
 
   useEffect(() => {
-    // Fetch transaction data from the backend when the component mounts
     const fetchTransactions = async () => {
       try {
         const response = await axios.get('http://localhost:8080/transactions/{accountId}');
@@ -58,12 +62,55 @@ export default function StickyHeadTable() {
     setSearchQuery(event.target.value);
   };
 
-  const filteredRows = transactions.filter((row) =>
+  const handleMinAmountChange = (event) => {
+    setMinAmount(event.target.value);
+  };
+
+  const handleMaxAmountChange = (event) => {
+    setMaxAmount(event.target.value);
+  };
+
+  const handleSort = (columnId) => {
+    if (sortColumn === columnId) {
+      // Toggle sort direction if the same column is clicked again
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set the new sort column and default to ascending direction
+      setSortColumn(columnId);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedRows = [...transactions].sort((a, b) => {
+    // Handle sorting based on the sortColumn and sortDirection
+    if (sortColumn !== '') {
+      const aValue = a[sortColumn];
+      const bValue = b[sortColumn];
+      if (sortDirection === 'asc') {
+        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+      } else {
+        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+      }
+    }
+    return 0;
+  });
+
+  const filteredRows = sortedRows.filter((row) =>
     Object.values(row).some((value) =>
       value.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
-  );
-
+  ).filter(row => {
+    const amount = parseFloat(row['Amount']);
+    if (minAmount !== '' && maxAmount !== '') {
+      return amount >= parseFloat(minAmount) && amount <= parseFloat(maxAmount);
+    } else if (minAmount !== '') {
+      return amount >= parseFloat(minAmount);
+    } else if (maxAmount !== '') {
+      return amount <= parseFloat(maxAmount);
+    } else {
+      return true;
+    }
+  });
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', padding: 2 }}>
@@ -77,6 +124,30 @@ export default function StickyHeadTable() {
         margin="normal"
         onChange={handleSearchChange}
       />
+      <Grid container spacing={2}> {/* Grid container for side-by-side text fields */}
+        <Grid item xs={6}> {/* Grid item for minimum amount */}
+          <TextField
+            label="Minimum Amount"
+            type="number"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={minAmount}
+            onChange={handleMinAmountChange}
+          />
+        </Grid>
+        <Grid item xs={6}> {/* Grid item for maximum amount */}
+          <TextField
+            label="Maximum Amount"
+            type="number"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={maxAmount}
+            onChange={handleMaxAmountChange}
+          />
+        </Grid>
+      </Grid>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -87,7 +158,12 @@ export default function StickyHeadTable() {
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
                 >
-                  {column.label}
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span>{column.label}</span>
+                    <Button onClick={() => handleSort(column.id)}>
+                      {sortColumn === column.id && sortDirection === 'asc' ? '▲' : '▼'}
+                    </Button>
+                  </div>
                 </TableCell>
               ))}
             </TableRow>
@@ -95,27 +171,25 @@ export default function StickyHeadTable() {
           <TableBody>
             {filteredRows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.ref}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.id === 'Download Receipt' ? (
-                            <Button variant="contained" color="primary">
-                              Download
-                            </Button>
-                          ) : (
-                            column.format && typeof value === 'number' ?
-                              column.format(value) : value
-                          )}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+              .map((row) => (
+                <TableRow hover role="checkbox" tabIndex={-1} key={row['Transaction ID']}>
+                  {columns.map((column) => {
+                    const value = row[column.id];
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        {column.id === 'Download Receipt' ? (
+                          <Button variant="contained" color="primary">
+                            Download
+                          </Button>
+                        ) : (
+                          column.format && typeof value === 'number' ?
+                            column.format(value) : value
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

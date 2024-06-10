@@ -113,7 +113,7 @@ export default function Dashboard() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', position: 'relative' }}>
         <CssBaseline />
         <AppBar position="absolute" open={open}>
           <Toolbar
@@ -178,16 +178,16 @@ export default function Dashboard() {
             zIndex: 1,
           }}
         >
-         <Toolbar />
+          <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={4}>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ mb: 4 }}>
+              <Grid item xs={12}>
+                <Box sx={{ mb: 4, position: 'relative', zIndex: 2 }}>
                   <ShowBalance />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <Box sx={{ mb: 4 }}>
+              <Grid item xs={12}>
+                <Box sx={{ mb: 4, position: 'relative', zIndex: 2 }}>
                   <StickyHeadTable />
                 </Box>
               </Grid>
@@ -219,4 +219,4 @@ export default function Dashboard() {
       </Dialog>
     </ThemeProvider>
   );
-}
+}  

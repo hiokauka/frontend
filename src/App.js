@@ -25,7 +25,7 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/forgot" element={<Forgot />} />
             <Route path="/dashboard" element={<ProtectedRoute element={Dashboard} />} />
-            <Route path="/transactionshistory" element={<ProtectedRoute element={Transactions} />} />
+            <Route path="/transactionshistory"  element={<Transactions />} />
             <Route path="/currencyexchange" element={<ProtectedRoute element={Currencyexchg} />} />
             <Route path="/expenditureanalysis" element={<ProtectedRoute element={Expenditureanalyst} />} />
             <Route path="/settings" element={<ProtectedRoute element={Settings} />} />

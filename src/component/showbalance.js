@@ -30,7 +30,7 @@ const BalanceComponent = ({ height, width }) => {
     <Box
       sx={{
         height: height || 'auto', // Set height to the passed prop or 'auto'
-        width: width || 'auto',   // Set width to the passed prop or 'auto'
+        width: '300px',           // Set width to 300px
         border: '1px solid #ccc', // Add border to the box
         borderRadius: '8px',      // Optional: Add border-radius for rounded corners
         padding: '16px',          // Add padding inside the box
