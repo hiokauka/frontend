@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [username, setUsername] = useState('');
   const [securityQuestion, setSecurityQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [isSecurityQuestionCorrect, setIsSecurityQuestionCorrect] = useState(false);
@@ -13,17 +13,19 @@ const ForgotPasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [errorText, setErrorText] = useState('');
+  const [accountFound, setAccountFound] = useState(false);
 
-  const handlePhoneNumberSubmit = async () => {
+  const handleFindAccount = async () => {
     try {
-      const response = await axios.post('http://your-backend-url/api/forgot-password', {
-        phoneNumber: phoneNumber.trim(),
+      const response = await axios.post('http://your-backend-url/api/find-account', {
+        username: username.trim(),
       });
       if (response.data.securityQuestion) {
         setSecurityQuestion(response.data.securityQuestion);
+        setAccountFound(true);
       }
     } catch (error) {
-      console.error('Error submitting phone number:', error);
+      console.error('Error finding account:', error);
       // Handle error: display error message or redirect to error page
     }
   };
@@ -68,28 +70,30 @@ const ForgotPasswordPage = () => {
     setIsSnackbarOpen(false);
   };
 
-
   return (
     <Grid container spacing={2} justifyContent="center" alignItems="center">
       <Grid item xs={12} textAlign="center">
-        <Typography variant="h4">Forgot Password?</Typography>
-        <Typography variant="body1">Please enter your phone number to proceed.</Typography>
+        <Typography variant="h4" style={{ color: 'white' }}>Forgot Password?</Typography>
+        <Typography variant="body1" style={{ color: 'white' }}>Please enter your username to find your account.</Typography>
       </Grid>
       <Grid item xs={12} md={6}>
         <TextField
           fullWidth
-          label="Phone Number"
+          label="Username"
           size="small"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          InputProps={{
+            style: { backgroundColor: 'white' }, // Set background color of TextField
+          }}
         />
       </Grid>
       <Grid item xs={12} textAlign="center">
-        <Button variant="contained" color="primary" onClick={handlePhoneNumberSubmit}>
-          Submit Phone Number
+        <Button variant="contained" color="primary" onClick={handleFindAccount}>
+          Find Account
         </Button>
       </Grid>
-      {securityQuestion && (
+      {accountFound && (
         <>
           <Grid item xs={12} textAlign="center">
             <Typography variant="h6">{securityQuestion}</Typography>
@@ -102,6 +106,9 @@ const ForgotPasswordPage = () => {
               type="password"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
+              InputProps={{
+                style: { backgroundColor: 'white' }, // Set background color of TextField
+              }}
             />
           </Grid>
           <Grid item xs={12} textAlign="center">
@@ -124,6 +131,9 @@ const ForgotPasswordPage = () => {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              InputProps={{
+                style: { backgroundColor: 'white' }, // Set background color of TextField
+              }}
             />
           </Grid>
           <Grid item xs={12} textAlign="center">
@@ -139,6 +149,9 @@ const ForgotPasswordPage = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               error={confirmPassword !== '' && newPassword !== confirmPassword}
               helperText={errorText}
+              InputProps={{
+                style: { backgroundColor: 'white' }, // Set background color of TextField
+              }}
             />
           </Grid>
           <Grid item xs={12} textAlign="center">

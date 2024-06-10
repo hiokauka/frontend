@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Grid, Box, Typography, Container, MenuItem, Select, InputLabel, FormControl, Snackbar
 } from '@mui/material';
@@ -17,7 +17,22 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function SignUp() {
   const [open, setOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const [securityQuestions, setSecurityQuestions] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch security questions from the backend
+    const fetchSecurityQuestions = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/signup/security-questions');
+        setSecurityQuestions(response.data);
+      } catch (error) {
+        console.error('Error fetching security questions:', error);
+      }
+    };
+
+    fetchSecurityQuestions();
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -34,7 +49,6 @@ export default function SignUp() {
       state: formData.get('state'),
       postcode: formData.get('postcode'),
       country: formData.get('country'),
-      userImageURL: formData.get('userImageURL'),
       emailAddress: formData.get('emailAddress'),
       username: formData.get('username'),
       password: formData.get('password'),
@@ -96,6 +110,22 @@ export default function SignUp() {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <FormControl fullWidth required error={!!formErrors.role}>
+                  <InputLabel id="role-label">Role</InputLabel>
+                  <Select
+                    labelId="role-label"
+                    id="role"
+                    name="role"
+                    label="Role"
+                  >
+                    <MenuItem value="Platinum Patronus">Platinum Patronus</MenuItem>
+                    <MenuItem value="Silver Snitch">Silver Snitch</MenuItem>
+                    <MenuItem value="Golden Galleon">Golden Galleon</MenuItem>
+                  </Select>
+                  {formErrors.role && <Typography color="error">{formErrors.role}</Typography>}
+                </FormControl>
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   autoComplete="name"
@@ -201,17 +231,7 @@ export default function SignUp() {
                   helperText={formErrors.country}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="userImageURL"
-                  label="User Image URL"
-                  name="userImageURL"
-                  error={!!formErrors.userImageURL}
-                  helperText={formErrors.userImageURL}
-                />
-              </Grid>
+              
               <Grid item xs={12}>
                 <TextField
                   required
@@ -268,9 +288,9 @@ export default function SignUp() {
                     name="securityQuestionID"
                     label="Security Question"
                   >
-                    <MenuItem value="question1">Name of your first love</MenuItem>
-                    <MenuItem value="question2">Name of your mother</MenuItem>
-                    <MenuItem value="question3">Name of your favourite animal</MenuItem>
+                    {securityQuestions.map((question) => (
+                      <MenuItem key={question.id} value={question.id}>{question.questionText}</MenuItem>
+                    ))}
                   </Select>
                   {formErrors.securityQuestionID && <Typography color="error">{formErrors.securityQuestionID}</Typography>}
                 </FormControl>
@@ -299,10 +319,7 @@ export default function SignUp() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
+              
               </Grid>
             </Grid>
             <Button

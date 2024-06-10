@@ -1,13 +1,21 @@
-// Import the ForgotPasswordPage component
+import React from 'react';
 import ForgotPasswordPage from './PasswordReset';
+import { Box } from '@mui/material';
 
-// Render the ForgotPasswordPage component in your route or page component
 function PasswordResetPage() {
   return (
-    <div>
-      
+    <Box
+      sx={{
+        backgroundImage: `url('/bggringgot(for).jpg')`, // Replace 'path/to/background-image.jpg' with the path to your background image
+        backgroundSize: 'cover',
+        minHeight: '100vh', // Ensure the background covers the entire viewport
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <ForgotPasswordPage />
-    </div>
+    </Box>
   );
 }
 
