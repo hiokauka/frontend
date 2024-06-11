@@ -96,27 +96,40 @@ const defaultTheme = createTheme();
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [username, setUsername] = React.useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+  const getAccountID = async () => {
+
+    try {
+
+      const getAccountIDUrl = 'http://localhost:8080/accounts/' + localStorage.getItem('username');
+
+      const response = await axios.get(getAccountIDUrl);
+
+      const accountID = response.data.accountID;
+      localStorage.setItem('accountID', accountID);
+
+    } catch (error) {
+
+      console.log('There was an error fetching the logged in account.', error);
+
+    }
+
+  }
+
   useEffect(() => {
+
     // Fetch user data when component mounts
-    axios.get('http://localhost:8080/accounts/{accountId}/username')
-      .then(response => {
-        setUsername(response.data.username);
-      })
-      .catch(error => {
-        console.error('Error fetching user data:', error);
-      });
+    getAccountID();
+    
   }, []);
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  
   const handleLogout = () => {
     // Add your logout logic here
     console.log('Logout confirmed');
@@ -163,7 +176,7 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-               Welcome, {username} 
+               Welcome, {localStorage.getItem('username')}
             </Typography>
             <Button color="inherit" onClick={handleDialogOpen}>
               Logout

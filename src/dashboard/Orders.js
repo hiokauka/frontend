@@ -7,38 +7,35 @@ import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 import { Link } from 'react-router-dom';
 import axios from 'axios'; // Import Axios for HTTP requests
-import { AuthProvider } from '../component/AuthContext';
 
 export default function Orders() {
   const [rows, setRows] = useState([]);
-  const [accountID, setAccountID] = useState(null);
-  const [username, getUsername] =
+  const [username, setUsername] = useState(localStorage.getItem('username'));
 
-  
-  
+  const getTransactionHistory = async () => {
+
+    if (!localStorage.getItem('username')) return; // Ensure accountID is not null before making the request
+
+    const getTransactionHistoryURL = 'http://localhost:8080/transactions/' + localStorage.getItem('accountID');
+
+    try {
+
+      const response = await axios.get(getTransactionHistoryURL);
+      setRows(response.data); // Setting the array of transactions to response.data
+
+    } catch (error) {
+
+      console.error('There was an error fetching the transaction history.', error);
+
+    }
+
+  };
+
   useEffect(() => {
-    // Fetch data from the backend
-    // Get the account ID
-    const getAccountURL = 'https://localhost:8080/accounts/' + username
-    axios.get(getAccountURL).then (response => { setAccountID(response.data.accountID)});
 
-    // Get the balance of the account for the first currency (Knut, K)
-    // const getKnutBalanceURL = 'http://localhost:8080/balances/' + accountID + '/1';
-    // axios.get(getKnutBalanceURL).then(response => { set })
+    getTransactionHistory();
 
-    // Get the transaction history array
-    // const getTransactionHistoryURL = 'http://localhost:8080/transactions/' + accountID;
-    // axios.get(getTransactionHistoryURL)
-    //   .then(response => {
-
-    //     // Set the array to the list of transactions of an account from the API
-    //     setRows(response.data);
-
-    //   })
-    //   .catch(error => {
-    //     console.error('There was an error fetching the transactions for the account.', error);
-    //   });
-    }, []);
+  }, [username]); // Run this effect whenever username or accountID changes
 
   return (
     <React.Fragment>
@@ -56,11 +53,11 @@ export default function Orders() {
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id}>
-              <TableCell>{row.id}</TableCell>
+              <TableCell>{row.transactionId}</TableCell>
               <TableCell>{row.date}</TableCell>
               <TableCell>{row.paymentMethod}</TableCell>
-              <TableCell align="right">{`$${row.amount.toFixed(2)}`}</TableCell>
-              <TableCell>{row.currency}</TableCell>
+              <TableCell align="right">{row.amount}</TableCell>
+              <TableCell>{row.currency.abbreviation}</TableCell>
             </TableRow>
           ))}
         </TableBody>

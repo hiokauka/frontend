@@ -15,16 +15,16 @@ import Grid from '@mui/material/Grid'; // Import Grid
 import axios from 'axios';
 
 const columns = [
-  { id: 'Transaction ID', label: 'Transaction ID', minWidth: 65 },
-  { id: 'Date', label: 'Date', minWidth: 140, align: 'center' },
-  { id: 'From', label: 'From', minWidth: 100, align: 'center' },
-  { id: 'To', label: 'To', minWidth: 100, align: 'right' },
-  { id: 'Payment Method', label: 'Payment Method', minWidth: 170, align: 'right' },
-  { id: 'Card Number', label: 'Card Number', minWidth: 170, align: 'right' },
-  { id: 'Amount', label: 'Amount', minWidth: 170, align: 'right' },
-  { id: 'Currency', label: 'Currency', minWidth: 100, align: 'right' },
-  { id: 'Category', label: 'Category', minWidth: 170, align: 'right' },
-  { id: 'Download Receipt', label: 'Download Receipt', minWidth: 170, align: 'right' },
+  { id: 'transactionId', label: 'Transaction ID', minWidth: 65 },
+  { id: 'date', label: 'Date', minWidth: 140, align: 'center' },
+  { id: 'fromAccount', label: 'From', minWidth: 100, align: 'center' },
+  { id: 'toAccount', label: 'To', minWidth: 100, align: 'right' },
+  { id: 'paymentMethod', label: 'Payment Method', minWidth: 170, align: 'right' },
+  { id: 'cardNumber', label: 'Card Number', minWidth: 170, align: 'right' },
+  { id: 'amount', label: 'Amount', minWidth: 170, align: 'right' },
+  { id: 'currency', label: 'Currency', minWidth: 100, align: 'right' },
+  { id: 'category', label: 'Category', minWidth: 170, align: 'right' },
+  { id: 'downloadReceipt', label: 'Download Receipt', minWidth: 170, align: 'right' },
 ];
 
 export default function StickyHeadTable() {
@@ -38,19 +38,26 @@ export default function StickyHeadTable() {
   const [sortDirection, setSortDirection] = useState('');
 
   useEffect(() => {
-
-    const transactionsURL = 'http://localhost:8080/transactions/{accountId}';
+    const transactionsURL = 'http://localhost:8080/transactions/' + localStorage.getItem('accountID');
 
     const fetchTransactions = async () => {
       try {
-        await axios.get(transactionsURL)
-        .then(response => {
-
-          setTransactions(response.data);
-          
-        })
+        const response = await axios.get(transactionsURL);
+        const mappedTransactions = response.data.map(transaction => ({
+          transactionId: transaction.transactionId,
+          date: new Date(transaction.date).toLocaleString(),
+          fromAccount: transaction.fromAccount.fullName,
+          toAccount: transaction.toAccount.fullName,
+          paymentMethod: transaction.paymentMethod,
+          cardNumber: transaction.card.cardNumber,
+          amount: transaction.amount,
+          currency: transaction.currency.abbreviation,
+          category: transaction.category,
+          downloadReceipt: transaction.receiptFileName,
+        }));
+        setTransactions(mappedTransactions);
       } catch (error) {
-        console.error('Error fetching security questions:', error);
+        console.error('Error fetching transactions', error);
       }
     };
     fetchTransactions();
@@ -79,10 +86,8 @@ export default function StickyHeadTable() {
 
   const handleSort = (columnId) => {
     if (sortColumn === columnId) {
-      // Toggle sort direction if the same column is clicked again
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      // Set the new sort column and default to ascending direction
       setSortColumn(columnId);
       setSortDirection('asc');
     }
@@ -91,12 +96,12 @@ export default function StickyHeadTable() {
   const handleDownload = async (transactionId) => {
     try {
       const response = await axios.get(`http://localhost:8080/transactions/${transactionId}/download`, {
-        responseType: 'blob', // Important to handle binary data
+        responseType: 'blob',
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `receipt_${transactionId}.pdf`); // or any other extension
+      link.setAttribute('download', `receipt_${transactionId}.pdf`);
       document.body.appendChild(link);
       link.click();
     } catch (error) {
@@ -105,7 +110,6 @@ export default function StickyHeadTable() {
   };
 
   const sortedRows = [...transactions].sort((a, b) => {
-    // Handle sorting based on the sortColumn and sortDirection
     if (sortColumn !== '') {
       const aValue = a[sortColumn];
       const bValue = b[sortColumn];
@@ -123,7 +127,7 @@ export default function StickyHeadTable() {
       value.toString().toLowerCase().includes(searchQuery.toLowerCase())
     )
   ).filter(row => {
-    const amount = parseFloat(row['Amount']);
+    const amount = parseFloat(row.amount);
     if (minAmount !== '' && maxAmount !== '') {
       return amount >= parseFloat(minAmount) && amount <= parseFloat(maxAmount);
     } else if (minAmount !== '') {
@@ -147,8 +151,8 @@ export default function StickyHeadTable() {
         margin="normal"
         onChange={handleSearchChange}
       />
-      <Grid container spacing={2}> {/* Grid container for side-by-side text fields */}
-        <Grid item xs={6}> {/* Grid item for minimum amount */}
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
           <TextField
             label="Minimum Amount"
             type="number"
@@ -159,7 +163,7 @@ export default function StickyHeadTable() {
             onChange={handleMinAmountChange}
           />
         </Grid>
-        <Grid item xs={6}> {/* Grid item for maximum amount */}
+        <Grid item xs={6}>
           <TextField
             label="Maximum Amount"
             type="number"
@@ -195,22 +199,21 @@ export default function StickyHeadTable() {
             {filteredRows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row['Transaction ID']}>
+                <TableRow hover role="checkbox" tabIndex={-1} key={row.transactionId}>
                   {columns.map((column) => {
                     const value = row[column.id];
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.id === 'Download Receipt' ? (
+                        {column.id === 'downloadReceipt' ? (
                           <Button 
                             variant="contained" 
                             color="primary" 
-                            onClick={() => handleDownload(row['Transaction ID'])}
+                            onClick={() => handleDownload(row.transactionId)}
                           >
                             Download
                           </Button>
                         ) : (
-                          column.format && typeof value === 'number' ?
-                            column.format(value) : value
+                          column.format && typeof value === 'number' ? column.format(value) : value
                         )}
                       </TableCell>
                     );
