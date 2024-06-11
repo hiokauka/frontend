@@ -22,10 +22,18 @@ export default function SignUp() {
 
   useEffect(() => {
     // Fetch security questions from the backend
+
+    // 1. Craft the URL string
+    const securityquestionsURL = 'http://localhost:8080/securityquestions/all';
+
     const fetchSecurityQuestions = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/signup/security-questions');
-        setSecurityQuestions(response.data);
+        await axios.get(securityquestionsURL)
+        .then(response => {
+
+          setSecurityQuestions(response.data);
+          
+        })
       } catch (error) {
         console.error('Error fetching security questions:', error);
       }
@@ -289,7 +297,7 @@ export default function SignUp() {
                     label="Security Question"
                   >
                     {securityQuestions.map((question) => (
-                      <MenuItem key={question.id} value={question.id}>{question.questionText}</MenuItem>
+                      <MenuItem key={question.securityQuestionID} value={question.securityQuestionID}>{question.question}</MenuItem>
                     ))}
                   </Select>
                   {formErrors.securityQuestionID && <Typography color="error">{formErrors.securityQuestionID}</Typography>}

@@ -11,20 +11,43 @@ export default function Deposits() {
 
 
   useEffect(() => {
+    // Define the username and password
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
 
-    const storedAccount = axios.get(`http://localhost:8080/account/${accountId}`) // Replace {accountId} with the appropriate account ID
-    // Fetch balance data from the backend when the component mounts
-    accountId = 
-    axios.get(`http://localhost:8080/balances/${accountId}`) // Replace {accountId} with the appropriate account ID
-      .then(response => {
-        // Assuming the response contains balance and date
-        const { balance, date } = response.data;
-        setBalance(balance);
-        setDate(date);
-      })
-      .catch(error => {
-        console.error('Error fetching the balance data:', error);
-      });
+    const getAccountUrl = 'http://localhost:8080/accounts/' + username;
+
+    const getAccount = async () => {
+      await axios.get(getAccountUrl)
+        .then(response => {
+          const accountID = response.data.accountID;
+
+          // Create a base64 encoded string for Basic Authentication
+          const basicAuth = btoa(`${username}:${password}`);
+          const basic = 'Basic ' + btoa(username + ':' + password);
+
+          // Use the obtained accountId to fetch balance data
+          const balanceKnut = 'http://localhost:8080/balances/' + accountID + '/1';
+
+          axios.get(balanceKnut, {
+            headers: { Authorization: basic }
+          })
+            .then(balanceResponse => {
+              // Assuming the response contains balance and date
+              const { balance, date } = balanceResponse.data;
+              setBalance(balance);
+              setDate(date);
+            })
+            .catch(balanceError => {
+              console.error('Error fetching the balance data:', balanceError);
+            });
+        })
+        .catch(accountError => {
+          console.error('Error fetching the account data:', accountError);
+        });
+    };
+
+    getAccount();
   }, []);
 
   return (

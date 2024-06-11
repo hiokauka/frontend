@@ -38,12 +38,19 @@ export default function StickyHeadTable() {
   const [sortDirection, setSortDirection] = useState('');
 
   useEffect(() => {
+
+    const transactionsURL = 'http://localhost:8080/transactions/{accountId}';
+
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/transactions/{accountId}');
-        setTransactions(response.data);
+        await axios.get(transactionsURL)
+        .then(response => {
+
+          setTransactions(response.data);
+          
+        })
       } catch (error) {
-        console.error('Error fetching transactions:', error);
+        console.error('Error fetching security questions:', error);
       }
     };
     fetchTransactions();

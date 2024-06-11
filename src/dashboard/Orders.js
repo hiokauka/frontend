@@ -11,6 +11,8 @@ import axios from 'axios'; // Import Axios for HTTP requests
 export default function Orders() {
   const [rows, setRows] = useState([]);
 
+  const transactionshistory = 'http://localhost:8080/balances/' + accountID + '/1'; 
+  
   useEffect(() => {
     // Fetch data from the backend
     axios.get('https://localhost:8080/transactions/{accountId}')

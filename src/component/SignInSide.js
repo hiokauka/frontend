@@ -29,7 +29,7 @@ export default function SignInSide() {
     const password = formData.get('password');
 
     // Store the username
-    localStorage.setItem('username', username);
+    // localStorage.setItem('username', username);
 
     setUsernameError(!username);
     setPasswordError(!password);
@@ -51,7 +51,7 @@ export default function SignInSide() {
 
       const role = response.data;
 
-      login(role); // Set authenticated state and role
+      login(role, username, password); // Set authenticated state and role
 
       if (role === 'ROLE_GOBLIN') {
         navigate('/admin');

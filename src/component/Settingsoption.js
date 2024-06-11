@@ -24,39 +24,60 @@ const SettingsComponent = () => {
   const [securityAnswer, setSecurityAnswer] = useState('');
   const [securityPIN, setSecurityPIN] = useState('');
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await axios.get('http://localhost:8080/accounts/{accountId}/settings');
-        const userData = response.data;
+  const usernameold = localStorage.getItem('username');
+  const passwordold = localStorage.getItem('password'); 
 
-        // Update state with fetched data
-        setFullName(userData.fullName);
-        setGender(userData.gender);
-        setDateOfBirth(userData.dateOfBirth);
-        setAddress({
-          streetName1: userData.streetName1,
-          streetName2: userData.streetName2,
-          town: userData.town,
-          state: userData.state,
-          postcode: userData.postcode,
-          country: userData.country,
+  useEffect(() => {
+    const getAccountUrl = 'http://localhost:8080/accounts/' + usernameold;
+    
+    const getAccount = async () => {
+      try {
+        const response = await axios.get(getAccountUrl, {
+          headers: { Authorization: 'Basic ' + btoa(usernameold + ':' + passwordold) }
         });
-        setUserImageURL(userData.userImageURL);
-        setEmailAddress(userData.emailAddress);
-        setUsername(userData.username);
-        setPassword(userData.password);
-        setTelephoneNumber(userData.telephoneNumber);
-        setSecurityQuestionID(userData.securityQuestionID);
-        setSecurityAnswer(userData.securityAnswer);
-        setSecurityPIN(userData.securityPIN);
+
+        const accountID = response.data.accountID;
+
+        const fetchSettings = async () => {
+          try {
+            const response = await axios.get(`http://localhost:8080/accounts/${accountID}/settings`, {
+              headers: { Authorization: 'Basic ' + btoa(usernameold + ':' + passwordold) }
+            });
+            const userData = response.data;
+
+            // Update state with fetched data
+            setFullName(userData.fullName);
+            setGender(userData.gender);
+            setDateOfBirth(userData.dateOfBirth);
+            setAddress({
+              streetName1: userData.streetName1,
+              streetName2: userData.streetName2,
+              town: userData.town,
+              state: userData.state,
+              postcode: userData.postcode,
+              country: userData.country,
+            });
+            setUserImageURL(userData.userImageURL);
+            setEmailAddress(userData.emailAddress);
+            setUsername(userData.username);
+            
+            setTelephoneNumber(userData.telephoneNumber);
+            setSecurityQuestionID(userData.securityQuestionID);
+            setSecurityAnswer(userData.securityAnswer);
+            
+          } catch (error) {
+            console.error('Error fetching settings:', error);
+          }
+        };
+
+        fetchSettings();
       } catch (error) {
-        console.error('Error fetching settings:', error);
+        console.error('Error fetching account data:', error);
       }
     };
 
-    fetchSettings();
-  }, []);
+    getAccount();
+  }, [usernameold, passwordold]);
 
   const handleSaveChanges = async () => {
     const updatedData = {
@@ -75,15 +96,22 @@ const SettingsComponent = () => {
     };
 
     try {
-      await axios.put('http://localhost:8080/accounts/{accountId}/settings', updatedData);
+      const accountID = await getAccountID(usernameold, passwordold);
+      const accountsettingsupdateurl = 'http://localhost:8080/accounts/' + accountID + '/settings';
+      await axios.put(accountsettingsupdateurl, updatedData, {
+        headers: { Authorization: 'Basic ' + btoa(usernameold + ':' + passwordold) }
+      });
       console.log('Changes saved successfully!');
     } catch (error) {
       console.error('Error saving changes:', error);
     }
   };
 
-  const handleAddCard = () => {
-    console.log('Add card clicked!');
+  const getAccountID = async (username, password) => {
+    const response = await axios.get(`http://localhost:8080/accounts/${username}`, {
+      headers: { Authorization: 'Basic ' + btoa(username + ':' + password) }
+    });
+    return response.data.accountID;
   };
 
   return (
@@ -159,14 +187,6 @@ const SettingsComponent = () => {
         label="Country"
         value={address.country}
         onChange={(e) => setAddress({ ...address, country: e.target.value })}
-        fullWidth
-        margin="normal"
-        sx={{ backgroundColor: 'white' }}
-      />
-      <TextField
-        label="Profile Image URL"
-        value={userImageURL}
-        onChange={(e) => setUserImageURL(e.target.value)}
         fullWidth
         margin="normal"
         sx={{ backgroundColor: 'white' }}
