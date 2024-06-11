@@ -7,10 +7,15 @@ import axios from 'axios';
 export default function Deposits() {
   const [balance, setBalance] = useState(null);
   const [date, setDate] = useState(null);
+  const [accountId, setAccountId] = useState(null);
+
 
   useEffect(() => {
+
+    const storedAccount = axios.get(`http://localhost:8080/account/${accountId}`) // Replace {accountId} with the appropriate account ID
     // Fetch balance data from the backend when the component mounts
-    axios.get('http://localhost:8080/balances/{accountId}') // Replace {accountId} with the appropriate account ID
+    accountId = 
+    axios.get(`http://localhost:8080/balances/${accountId}`) // Replace {accountId} with the appropriate account ID
       .then(response => {
         // Assuming the response contains balance and date
         const { balance, date } = response.data;

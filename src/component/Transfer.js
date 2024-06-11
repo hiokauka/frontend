@@ -22,6 +22,7 @@ import Container from '@mui/material/Container'; // <-- Add this import
 import { mainListItems } from '../dashboard/listItems';
 import { useNavigate } from 'react-router-dom';
 import TransferOptions from './Transferoption';
+import { useAuth } from './AuthContext';
 
 function Copyright(props) {
   return (
@@ -90,14 +91,18 @@ export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   const handleLogout = () => {
-    // Add your logout logic here
+
     console.log('Logout confirmed');
+
+    logout();
+
     setDialogOpen(false);
     navigate('/signin'); // Redirect to sign-in page
   };

@@ -28,6 +28,7 @@ import Deposits from './Deposits';
 import Orders from './Orders';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../component/AuthContext';
 
 function Copyright(props) {
   return (
@@ -98,6 +99,7 @@ export default function Dashboard() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [username, setUsername] = React.useState('');
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     // Fetch user data when component mounts
@@ -118,6 +120,8 @@ export default function Dashboard() {
   const handleLogout = () => {
     // Add your logout logic here
     console.log('Logout confirmed');
+    logout();
+
     setDialogOpen(false);
     navigate('/signin'); // Redirect to sign-in page
   };
