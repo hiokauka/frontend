@@ -4,13 +4,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import { Link } from 'react-router-dom'; 
-import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import PaidIcon from '@mui/icons-material/Paid';
 import HomeIcon from '@mui/icons-material/Home';
-import PaymentIcon from '@mui/icons-material/Payment';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import PriceChangeIcon from '@mui/icons-material/PriceChange';
+import ListIcon from '@mui/icons-material/List';
 
 export const mainListItems = (
   <React.Fragment>
@@ -20,6 +17,23 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Goblin Dashboard" />
     </ListItemButton>
-   
+    <ListItemButton component={Link} to="/Adminuserlist">
+      <ListItemIcon>
+        <ListIcon />
+      </ListItemIcon>
+      <ListItemText primary="User list" />
+    </ListItemButton>
+    <ListItemButton component={Link} to="/Admintransactions">
+      <ListItemIcon>
+        <PriceChangeIcon />
+      </ListItemIcon>
+      <ListItemText primary="All Transactions" />
+    </ListItemButton>
+    <ListItemButton component={Link} to="/Admincurrency">
+      <ListItemIcon>
+        <PaidIcon  />
+      </ListItemIcon>
+      <ListItemText primary="Edit Currency" />
+    </ListItemButton>
   </React.Fragment>
 );
