@@ -7,23 +7,38 @@ import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 import { Link } from 'react-router-dom';
 import axios from 'axios'; // Import Axios for HTTP requests
+import { AuthProvider } from '../component/AuthContext';
 
 export default function Orders() {
   const [rows, setRows] = useState([]);
+  const [accountID, setAccountID] = useState(null);
+  const [username, getUsername] =
 
-  const transactionshistory = 'http://localhost:8080/balances/' + accountID + '/1'; 
+  
   
   useEffect(() => {
     // Fetch data from the backend
-    axios.get('https://localhost:8080/transactions/{accountId}')
-      .then(response => {
-        // Assuming the response data structure matches what we need
-        setRows(response.data);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the transactions!', error);
-      });
-  }, []);
+    // Get the account ID
+    const getAccountURL = 'https://localhost:8080/accounts/' + username
+    axios.get(getAccountURL).then (response => { setAccountID(response.data.accountID)});
+
+    // Get the balance of the account for the first currency (Knut, K)
+    // const getKnutBalanceURL = 'http://localhost:8080/balances/' + accountID + '/1';
+    // axios.get(getKnutBalanceURL).then(response => { set })
+
+    // Get the transaction history array
+    // const getTransactionHistoryURL = 'http://localhost:8080/transactions/' + accountID;
+    // axios.get(getTransactionHistoryURL)
+    //   .then(response => {
+
+    //     // Set the array to the list of transactions of an account from the API
+    //     setRows(response.data);
+
+    //   })
+    //   .catch(error => {
+    //     console.error('There was an error fetching the transactions for the account.', error);
+    //   });
+    }, []);
 
   return (
     <React.Fragment>
