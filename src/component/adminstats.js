@@ -46,15 +46,7 @@ export default function Statistics() {
         </Paper>
       </Grid>
 
-      {/* Revenue this month */}
-      <Grid item xs={12} md={4}>
-        <Paper elevation={3} sx={{ p: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Revenue This Month
-          </Typography>
-          <Typography variant="h4">${statisticsData.revenueThisMonth}</Typography>
-        </Paper>
-      </Grid>
+    
 
       {/* Add more statistics as needed */}
     </Grid>

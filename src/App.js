@@ -13,7 +13,9 @@ import AdminDashboard from './component/Admindashboard';
 import AddCard from './component/AddCard';
 import { AuthProvider } from './component/AuthContext';
 import ProtectedRoute from './component/ProtectedRoute';
-
+import Admincurrency from './component/admincurrency';
+import Admintransactions from './component/admintransactions';
+import Adminuserlist from './component/adminuserlist';
 function App() {
   return (
     <AuthProvider>
@@ -26,12 +28,15 @@ function App() {
             <Route path="/forgot" element={<Forgot />} />
             <Route path="/dashboard" element={<ProtectedRoute element={Dashboard} />} />
             <Route path="/transactionshistory"  element={<Transactions />} />
-            <Route path="/currencyexchange" element={<ProtectedRoute element={Currencyexchg} />} />
+            <Route path="/currencyexchange" element={<Currencyexchg />} />
             <Route path="/expenditureanalysis" element={<ProtectedRoute element={Expenditureanalyst} />} />
             <Route path="/settings" element={<ProtectedRoute element={Settings} />} />
             <Route path="/transfer" element={<ProtectedRoute element={Transfer} />} />
-            <Route path="/Admin" element={<ProtectedRoute element={AdminDashboard} />} />
+            <Route path="/Admin" element={<AdminDashboard />} />
             <Route path="/Addcard" element={<ProtectedRoute element={AddCard} />} />
+            <Route path="/Admintransactions" element={<Admintransactions/>} />
+            <Route path="/Admincurrency" element={<Admincurrency/>} />
+            <Route path="/Adminuserlist" element={<Adminuserlist />} />
           </Routes>
         </div>
       </Router>
