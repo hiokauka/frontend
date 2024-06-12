@@ -3,44 +3,68 @@ import { Typography, Grid, Select, MenuItem, Box } from '@mui/material';
 import axios from 'axios';
 
 const BalanceComponent = ({ height, width }) => {
-  const [selectedCurrency, setSelectedCurrency] = useState('');
-  const [currencies, setCurrencies] = useState([]);
+
   const [balances, setBalances] = useState([]);
+  const [selectedBalanceIndex, setSelectedBalanceIndex] = useState(0);
+  const [selectedBalance, setSelectedBalance] = useState();
+  const [selectedCurrency, setSelectedCurrency] = useState();
+  const [selectedCurrencyAbbreviation, setSelectedCurrencyAbbreviation] = useState();
+
+  const fetchData = async () => {
+
+    try {
+
+      // Fetch currencies
+      const response = await axios.get('http://localhost:8080/balances/' + localStorage.getItem('accountID'));
+      setBalances(response.data)
+
+      // Extract currency names from the response
+      // const currencyNames = currenciesData.map(currency => currency.name);
+      // Set the currencies state with the fetched currency names
+      // setCurrencies(currencyNames);
+
+      // // Fetch balances
+      // const userId = localStorage.getItem('accountId');
+      // const balanceResponses = await Promise.all(
+      //   currenciesData.map(currency => axios.get(`http://localhost:8080/balances/${userId}/${currency.currencyID}`))
+      // );
+      // // Extract balances from the response
+      // const balancesData = balanceResponses.map(response => response.data.balance);
+      // Set the balances state with the fetched balances
+      // setBalances(balancesData);
+
+      // Set the default selected currency as the first currency
+
+      setSelectedCurrency(balances[0].currency.name); // Set default to the first currency name
+      setSelectedBalance(balances[0].balance);
+
+    } catch (error) {
+
+      console.error('Error fetching data:', error);
+
+      // Handle error: display error message or redirect to error page
+
+    }
+
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch currencies
-        const currencyResponse = await axios.get('http://localhost:8080/currencies');
-        const currenciesData = currencyResponse.data;
-        // Extract currency names from the response
-        const currencyNames = currenciesData.map(currency => currency.name);
-        // Set the currencies state with the fetched currency names
-        setCurrencies(currencyNames);
 
-        // Fetch balances
-        const userId = localStorage.getItem('accountId');
-        const balanceResponses = await Promise.all(
-          currenciesData.map(currency => axios.get(`http://localhost:8080/balances/${userId}/${currency.currencyId}`))
-        );
-        // Extract balances from the response
-        const balancesData = balanceResponses.map(response => response.data.balance);
-        // Set the balances state with the fetched balances
-        setBalances(balancesData);
-
-        // Set the default selected currency as the first currency
-        setSelectedCurrency(currencyNames[0]);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        // Handle error: display error message or redirect to error page
-      }
-    };
 
     fetchData();
+
   }, []);
 
+  
+
   const handleCurrencyChange = (event) => {
-    setSelectedCurrency(event.target.value);
+
+    const selectedIndex = event.target.value;
+    setSelectedCurrency(balances[selectedIndex].currency.name);
+    // setSelectedBalanceIndex(selectedIndex);
+    setSelectedBalance(balances[selectedIndex].balance.toFixed(2));
+    setSelectedCurrencyAbbreviation(balances[selectedIndex].currency.abbreviation);
+
   };
 
   return (
@@ -58,9 +82,9 @@ const BalanceComponent = ({ height, width }) => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Select value={selectedCurrency} onChange={handleCurrencyChange} fullWidth>
-            {currencies.map((currency, index) => (
-              <MenuItem key={index} value={currency}>
-                {currency}
+            {balances.map((balance, index) => (
+              <MenuItem id='menu-item' key={index} value={index}>
+                {balance.currency.name}
               </MenuItem>
             ))}
           </Select>
@@ -70,7 +94,7 @@ const BalanceComponent = ({ height, width }) => {
             {selectedCurrency}
           </Typography>
           <Typography variant="h2" gutterBottom sx={{ fontSize: '3rem' }}>
-            {balances[currencies.indexOf(selectedCurrency)]}
+            {selectedBalance} {selectedCurrencyAbbreviation}
           </Typography>
         </Grid>
       </Grid>

@@ -15,7 +15,7 @@ export default function Deposits() {
       const getBalanceKnutUrl = 'http://localhost:8080/balances/' + localStorage.getItem('accountID') + '/1'
 
       const response = await axios.get(getBalanceKnutUrl);
-      setBalance(response.data.balance);
+      setBalance(response.data.balance.toFixed(2));
 
     } catch (error) {
 
@@ -38,11 +38,11 @@ export default function Deposits() {
         {balance !== null ? balance : 'Loading...'}
       </Typography>
       <Typography color="text.secondary" sx={{ flex: 1 }}>
-        {date !== null ? `on ${date}` : 'Loading...'}
+        Knut
       </Typography>
       <div>
         <Link to="/transactionshistory" color="primary">
-          View Balance
+          View More Balances
         </Link>
       </div>
     </React.Fragment>

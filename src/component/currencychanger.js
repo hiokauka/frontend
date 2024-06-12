@@ -1,66 +1,106 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, MenuItem, Button, Typography, Paper } from '@mui/material';
 import axios from 'axios';
 
-const currencies = ['Sickle', 'Knut', 'Galleon'];
-
 const CurrencyChanger = () => {
   const [amount, setAmount] = useState('');
-  const [fromCurrency, setFromCurrency] = useState('Sickle');
-  const [toCurrency, setToCurrency] = useState('Knut');
+  const [Currencies, setCurrency] = useState([]);
+  const [fromCurrency, setFromCurrency] = useState({});
+  const [toCurrency, setToCurrency] = useState({});
   const [convertedAmount, setConvertedAmount] = useState(null);
-  const [balances, setBalances] = useState({
-    Sickle: 0,
-    Knut: 0,
-    Galleon: 0,
-  });
+  const [processingFees, setProcessingFees] = useState(null);
+  const [showProcess, setShowProcess] = useState(false);
+  const [conversionDetails, setConversionDetails] = useState('');
+  const [balances, setBalances] = useState({});
+  const exchangeURL = 'http://localhost:8080/exchange/convert';
+  const processExchangeUrl = 'http://localhost:8080/exchange/process';
 
-  const handleConvert = async () => {
-    if (amount && !isNaN(amount)) {
+  useEffect(() => {
+    const currenciesURL = 'http://localhost:8080/currencies/all';
+    const fetchData = async () => {
       try {
-        const exchangeRequestDTO = {
-          amount: parseFloat(amount),
-          fromCurrency,
-          toCurrency,
-        };
-        const response = await axios.post('http://localhost:8080/exchange/convert', exchangeRequestDTO);
-        const convertedAmount = response.data.convertedAmount.toFixed(2);
-        setConvertedAmount(convertedAmount);
+        const response = await axios.get(currenciesURL);
+        setCurrency(response.data);
+        
       } catch (error) {
-        console.error('Error fetching exchange rates:', error);
+        console.error('Error fetching data:', error);
       }
+    };
+    fetchData();
+  }, []);
+
+  const handleCurrencyChange1 = (event) => {
+    const selectedIndex = event.target.value;
+    event.target.value = Currencies[selectedIndex];
+    setFromCurrency(Currencies[selectedIndex]);
+    if (fromCurrency && Object.keys(fromCurrency).length > 0) {
+      console.log('fromCurrency:', fromCurrency);
+      // You can also render something based on this condition
+    } else {
+      console.log('fromCurrency is not set properly');
+    }
+    
+  };
+  
+  const handleCurrencyChange2 = (event) => {
+    const selectedIndex = event.target.value;
+    event.target.value = Currencies[selectedIndex];
+    setToCurrency(Currencies[selectedIndex]);
+    if (toCurrency && Object.keys(toCurrency).length > 0) {
+      console.log('toCurrency:', toCurrency);
+      // You can also render something based on this condition
+    } else {
+      console.log('toCurrency is not set properly');
     }
   };
 
-  const handleAdd = async () => {
-    if (convertedAmount !== null) {
-      const newBalances = { ...balances };
-      const newToBalance = newBalances[toCurrency] + parseFloat(convertedAmount);
-      const newFromBalance = newBalances[fromCurrency] - parseFloat(amount);
-      if (newFromBalance >= 0) {
-        newBalances[toCurrency] = newToBalance;
-        newBalances[fromCurrency] = newFromBalance;
-        setBalances(newBalances);
-        setConvertedAmount(null);
-        setAmount('');
+  const handleConvert = async () => {
+    try {
+      const requestData = {
+        fromCurrencyID: fromCurrency.currencyID,
+        toCurrencyID: toCurrency.currencyID,
+        initialAmount: parseFloat(amount)
+      };
 
-        // Simulate backend API call to update balances
-        try {
-          const processExchangeRequestDTO = {
-            fromCurrency,
-            toCurrency,
-            amount: parseFloat(amount),
-            convertedAmount: parseFloat(convertedAmount),
-          };
-          await axios.post('http://localhost:8080/exchange/process', processExchangeRequestDTO);
-          console.log('Balances updated successfully.');
-        } catch (error) {
-          console.error('Error updating balances:', error);
-        }
-      } else {
-        alert('Insufficient balance.');
+      const response = await axios.post(exchangeURL, requestData);
+      const exchangeData = response.data;
+      console.log('Exchange Data:', exchangeData);
+
+      if (exchangeData) {
+        const initialAmount = exchangeData.initialAmount;
+        const exchangeRate = exchangeData.exchangedamount;
+        const fees = exchangeData.totalProcessingFee;
+        const convertedAmount = exchangeData.exchangedAmount;
+
+        setProcessingFees(fees);
+        setConvertedAmount(convertedAmount);
+        setConversionDetails(
+          `${initialAmount} ${fromCurrency.name} = ${convertedAmount} ${toCurrency.name}, total processing fees = ${fees} ${fromCurrency.name}`
+        );
+        
+        setShowProcess(true);
       }
+    } catch (error) {
+      console.error('Error fetching exchange data:', error);
     }
+  };
+
+  const handleProcess = async () => {
+    
+    const processExchangeRequestDTO = {
+
+      "accountID": localStorage.getItem('accountID'),
+      "fromCurrencyID": fromCurrency.currencyID,
+      "toCurrencyID": toCurrency.currencyID,
+      "initialAmount": parseFloat(amount)
+
+    };
+
+    const response = await axios.post(processExchangeUrl, processExchangeRequestDTO);
+
+    const result = response.data;
+    console.log(result);
+
   };
 
   return (
@@ -79,54 +119,47 @@ const CurrencyChanger = () => {
       <TextField
         select
         label="From"
-        value={fromCurrency}
-        onChange={(e) => setFromCurrency(e.target.value)}
+        value={fromCurrency.id}
+        onChange={handleCurrencyChange1}
         fullWidth
         margin="normal"
         variant="outlined"
       >
-        {currencies.map((currency) => (
-          <MenuItem key={currency} value={currency}>
-            {currency}
+        {Currencies.map((currency, index) => (
+          <MenuItem key={index} value={index}>
+            {currency.name}
           </MenuItem>
         ))}
       </TextField>
       <TextField
         select
         label="To"
-        value={toCurrency}
-        onChange={(e) => setToCurrency(e.target.value)}
+        value={toCurrency.id}
+        onChange={handleCurrencyChange2}
         fullWidth
         margin="normal"
         variant="outlined"
       >
-        {currencies.map((currency) => (
-          <MenuItem key={currency} value={currency}>
-            {currency}
+        {Currencies.map((currency, index) => (
+          <MenuItem key={index} value={index}>
+            {currency.name}
           </MenuItem>
         ))}
       </TextField>
       <Button variant="contained" color="primary" onClick={handleConvert} sx={{ mt: 2, mr: 1 }}>
         Convert
       </Button>
-      <Button variant="contained" color="primary" onClick={handleAdd} sx={{ mt: 2 }}>
-        Add
-      </Button>
-      {convertedAmount !== null && (
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          {amount} {fromCurrency} = {convertedAmount} {toCurrency}
-        </Typography>
+      {showProcess && (
+        <>
+          <Typography variant="body1" gutterBottom>
+            {conversionDetails}
+          </Typography>
+          <Button variant="contained" color="primary" onClick={handleProcess} sx={{ mt: 2 }}>
+            Process
+          </Button>
+
+        </>
       )}
-      <Typography variant="body1" sx={{ mt: 2 }}>
-        Balances:
-      </Typography>
-      <ul>
-        {Object.entries(balances).map(([currency, balance]) => (
-          <li key={currency}>
-            {currency}: {balance}
-          </li>
-        ))}
-      </ul>
     </Paper>
   );
 };
