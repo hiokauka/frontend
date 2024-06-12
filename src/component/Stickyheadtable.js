@@ -37,30 +37,40 @@ export default function StickyHeadTable() {
   const [sortColumn, setSortColumn] = useState('');
   const [sortDirection, setSortDirection] = useState('');
 
-  useEffect(() => {
-    const transactionsURL = 'http://localhost:8080/transactions/' + localStorage.getItem('accountID');
+  const transactionsURL = 'http://localhost:8080/transactions/' + localStorage.getItem('accountID');
 
-    const fetchTransactions = async () => {
-      try {
-        const response = await axios.get(transactionsURL);
-        const mappedTransactions = response.data.map(transaction => ({
-          transactionId: transaction.transactionId,
-          date: new Date(transaction.date).toLocaleString(),
-          fromAccount: transaction.fromAccount.fullName,
-          toAccount: transaction.toAccount.fullName,
-          paymentMethod: transaction.paymentMethod,
-          cardNumber: transaction.card.cardNumber,
-          amount: transaction.amount,
-          currency: transaction.currency.abbreviation,
-          category: transaction.category,
-          downloadReceipt: transaction.receiptFileName,
-        }));
-        setTransactions(mappedTransactions);
-      } catch (error) {
-        console.error('Error fetching transactions', error);
-      }
-    };
+  const fetchTransactions = async () => {
+      
+    try {
+
+      const response = await axios.get(transactionsURL);
+      const mappedTransactions = response.data.map(transaction => ({
+        transactionId: transaction.transactionId,
+        date: new Date(transaction.date).toLocaleString(),
+        fromAccount: transaction.fromAccount.fullName,
+        toAccount: transaction.toAccount.fullName,
+        paymentMethod: transaction.paymentMethod,
+        cardNumber: transaction.card.cardNumber,
+        amount: transaction.amount,
+        currency: transaction.currency.abbreviation,
+        category: transaction.category,
+        downloadReceipt: transaction.receiptFileName
+
+      }));
+
+      setTransactions(mappedTransactions);
+
+    } catch (error) {
+
+      console.error('Error fetching transactions', error);
+
+    }
+  };
+
+  useEffect(() => {
+    
     fetchTransactions();
+
   }, []);
 
   const handleChangePage = (event, newPage) => {
@@ -95,9 +105,11 @@ export default function StickyHeadTable() {
 
   const handleDownload = async (transactionId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/transactions/${transactionId}/download`, {
+      const getReceiptFileUrl = 'http://localhost:8080/transactions/' + transactionId + '/download';
+      const response = await axios.get(getReceiptFileUrl, {
         responseType: 'blob',
       });
+      
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -110,34 +122,37 @@ export default function StickyHeadTable() {
   };
 
   const sortedRows = [...transactions].sort((a, b) => {
-    if (sortColumn !== '') {
-      const aValue = a[sortColumn];
-      const bValue = b[sortColumn];
-      if (sortDirection === 'asc') {
-        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-      } else {
-        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
-      }
-    }
-    return 0;
-  });
-
-  const filteredRows = sortedRows.filter((row) =>
-    Object.values(row).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  ).filter(row => {
-    const amount = parseFloat(row.amount);
-    if (minAmount !== '' && maxAmount !== '') {
-      return amount >= parseFloat(minAmount) && amount <= parseFloat(maxAmount);
-    } else if (minAmount !== '') {
-      return amount >= parseFloat(minAmount);
-    } else if (maxAmount !== '') {
-      return amount <= parseFloat(maxAmount);
+  if (sortColumn !== '') {
+    const aValue = a[sortColumn];
+    const bValue = b[sortColumn];
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
     } else {
-      return true;
+      return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
     }
-  });
+  }
+  return 0;
+});
+
+const filteredRows = sortedRows.filter((row) =>
+  Object.values(row).some((value) =>
+    value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+  )
+).filter(row => {
+  const amount = parseFloat(row.amount);
+  if (minAmount !== '' && maxAmount !== '') {
+    return amount >= parseFloat(minAmount) && amount <= parseFloat(maxAmount);
+  } else if (minAmount !== '') {
+    return amount >= parseFloat(minAmount);
+  } else if (maxAmount !== '') {
+    return amount <= parseFloat(maxAmount);
+  } else {
+    return true;
+  }
+});
+
+console.log(filteredRows); // Log filteredRows to verify the data
+
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', padding: 2 }}>
@@ -196,30 +211,31 @@ export default function StickyHeadTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredRows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.transactionId}>
-                  {columns.map((column) => {
-                    const value = row[column.id];
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        {column.id === 'downloadReceipt' ? (
-                          <Button 
-                            variant="contained" 
-                            color="primary" 
-                            onClick={() => handleDownload(row.transactionId)}
-                          >
-                            Download
-                          </Button>
-                        ) : (
-                          column.format && typeof value === 'number' ? column.format(value) : value
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
+          {filteredRows
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((row) => (
+              <TableRow hover role="checkbox" tabIndex={-1} key={row.transactionId}>
+                {columns.map((column) => {
+                  const value = row[column.id];
+                  return (
+                    <TableCell key={column.id} align={column.align}>
+                      {column.id === 'downloadReceipt' ? (
+                        <Button 
+                          variant="contained" 
+                          color="primary" 
+                          onClick={() => handleDownload(row.transactionId)}
+                        >
+                          Download
+                        </Button>
+                      ) : (
+                        value
+                      )}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+          ))}
+
           </TableBody>
         </Table>
       </TableContainer>
