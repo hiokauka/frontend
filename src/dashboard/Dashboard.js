@@ -34,8 +34,8 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" >
+        Fitri and Friends
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -53,7 +53,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#5A2207', // Change 'your_color_here' to the desired color value
+  backgroundColor: '#201200', // Change 'your_color_here' to the desired color value
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -91,39 +91,53 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+// Create a custom theme with the Bigelow Rules font
+const theme = createTheme({
+  typography: {
+    fontFamily: 'Bigelow Rules, cursive',
+    h1: {
+      fontSize: '4rem', // Increased font size
+    },
+    h2: {
+      fontSize: '3.5rem', // Increased font size
+    },
+    h3: {
+      fontSize: '3rem', // Increased font size
+    },
+    h4: {
+      fontSize: '2.5rem', // Increased font size
+    },
+    h5: {
+      fontSize: '2rem', // Increased font size
+    },
+    body1: {
+      fontSize: '1.5rem', // Increased font size
+    },
+    body2: {
+      fontSize: '1.25rem', // Increased font size
+    },
+  },
+});
 
 export default function Dashboard() {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   const getAccountID = async () => {
-
     try {
-
       const getAccountIDUrl = 'http://localhost:8080/accounts/' + localStorage.getItem('username');
-
       const response = await axios.get(getAccountIDUrl);
-
       const accountID = response.data.accountID;
       localStorage.setItem('accountID', accountID);
-
     } catch (error) {
-
       console.log('There was an error fetching the logged in account.', error);
-
     }
-
-  }
+  };
 
   useEffect(() => {
-
-    // Fetch user data when component mounts
     getAccountID();
-    
   }, []);
 
   const toggleDrawer = () => {
@@ -131,12 +145,9 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-    // Add your logout logic here
-    console.log('Logout confirmed');
     logout();
-
     setDialogOpen(false);
-    navigate('/signin'); // Redirect to sign-in page
+    navigate('/signin');
   };
 
   const handleDialogOpen = () => {
@@ -148,24 +159,17 @@ export default function Dashboard() {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <AppBar position="absolute" open={open}>
-          <Toolbar
-            sx={{
-              pr: '24px', // keep right padding when drawer closed
-            }}
-          >
+          <Toolbar sx={{ pr: '24px' }}>
             <IconButton
               edge="start"
               color="inherit"
               aria-label="open drawer"
               onClick={toggleDrawer}
-              sx={{
-                marginRight: '36px',
-                ...(open && { display: 'none' }),
-              }}
+              sx={{ marginRight: '36px', ...(open && { display: 'none' }) }}
             >
               <MenuIcon />
             </IconButton>
@@ -174,11 +178,11 @@ export default function Dashboard() {
               variant="h6"
               color="inherit"
               noWrap
-              sx={{ flexGrow: 1 }}
+              sx={{ flexGrow: 1, fontSize: '2rem' }}
             >
-               Welcome, {localStorage.getItem('username')}
+              Welcome, {localStorage.getItem('username')}
             </Typography>
-            <Button color="inherit" onClick={handleDialogOpen}>
+            <Button color="inherit" onClick={handleDialogOpen} sx={{ fontSize: '1.5rem' }}>
               Logout
             </Button>
           </Toolbar>
@@ -199,7 +203,6 @@ export default function Dashboard() {
           <Divider />
           <List component="nav">
             {mainListItems}
-          
           </List>
         </Drawer>
         <Box
@@ -209,7 +212,7 @@ export default function Dashboard() {
             height: '100vh',
             overflow: 'auto',
             position: 'relative',
-            backgroundImage: 'url(/bggringgot.jpg)', // Replace with your image path
+            backgroundImage: 'url(/bggringgot.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             zIndex: 1,
@@ -220,27 +223,13 @@ export default function Dashboard() {
             <Grid container spacing={3}>
               {/* Chart */}
               <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 240 }}>
                   <Chart />
                 </Paper>
               </Grid>
               {/* Recent Deposits */}
               <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 240 }}>
                   <Deposits />
                 </Paper>
               </Grid>

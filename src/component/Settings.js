@@ -27,8 +27,8 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" >
+        Fitri and Friends
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -46,7 +46,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#5A2207',
+  backgroundColor: '#201200',
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -84,8 +84,17 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const theme = createTheme({
+  typography: {
+    fontFamily: ['Bigelow Rules', 'sans-serif'].join(','),
+    h6: {
+      fontSize: '2rem', // Welcome text size
+    },
+    body1: {
+      fontSize: '1.5rem', // Logout button text size
+    },
+  },
+});
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
@@ -112,7 +121,7 @@ export default function Dashboard() {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <AppBar position="absolute" open={open}>
@@ -142,7 +151,7 @@ export default function Dashboard() {
             >
               Welcome, user
             </Typography>
-            <Button color="inherit" onClick={handleDialogOpen}>
+            <Button color="inherit" onClick={handleDialogOpen} sx={{ fontSize: '1.5rem' }}>
               Logout
             </Button>
           </Toolbar>
