@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import {
   Typography,
   Grid,
@@ -14,7 +13,6 @@ import {
   DialogActions,
   Snackbar,
 } from '@mui/material';
-
 import axios from 'axios';
 
 class TransferOptions extends Component {
@@ -32,15 +30,29 @@ class TransferOptions extends Component {
         category: '',
         description: '',
         securityPIN: '',
+        searchQuery: ''
       },
-      fetchedPin: '',
       successDialogOpen: false,
       notificationOpen: false,
       accountFound: false,
-      searchResults: [], // New state variable to store search results
-      selectedAccount: null, // New state variable to store selected account
-      targetAccount: null
+      searchResults: [],
+      selectedAccount: null,
+      targetAccount: null,
+      currencies: [],
+      fromCurrency: {},
     };
+  }
+
+  componentDidMount() {
+    const currenciesURL = 'http://localhost:8080/currencies/all';
+    axios
+      .get(currenciesURL)
+      .then((response) => {
+        this.setState({ currencies: response.data });
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   }
 
   handleChange = (event) => {
@@ -63,69 +75,40 @@ class TransferOptions extends Component {
       const searchResults = response.data;
 
       if (searchResults.length === 0) {
-
         try {
-
           const response = await axios.get(`http://localhost:8080/accounts/search?telephoneNumber=${searchQuery}`);
           const searchResults = response.data;
-
           if (searchResults.length === 0) {
             alert('No account found');
-
             return;
-
           } else {
-
-            this.setState({ searchResults });
-
+            this.setState({ searchResults, transactionTransfer: { ...transactionTransfer, securityPIN: '' }});
+            
           }
-
         } catch (error) {
-
           alert('There was an error while searching for accounts, please try again.', error);
-
           return;
-          
         }
-        
       } else {
-
-        this.setState({ searchResults });
+        this.setState({ searchResults, transactionTransfer: { ...transactionTransfer, securityPIN: '' }});
 
       }
-      
     } catch (error) {
-
       console.error('There was an error while searching for accounts, please try again.', error);
-
     }
-
   };
 
   handleAccountSelect = async (account) => {
-
     await this.setState({ selectedAccount: account });
-
-    const { selectedAccount } = this.state;
-
   };
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { pin, fetchedPin, transactionTransfer } = this.state;
+    const { transactionTransfer } = this.state;
     const { amount, currency } = transactionTransfer;
-    
-    if (pin !== fetchedPin) {
-      alert('Invalid PIN');
-      return;
-    }
 
     try {
-      // Simulating the transfer process
-      // Here, you would send the transfer details to your backend API
       console.log('Transfer details:', transactionTransfer);
-      
-      // After successful transfer, open success dialog
       this.setState({ successDialogOpen: true });
     } catch (error) {
       console.error('There was an error submitting the form:', error);
@@ -148,12 +131,17 @@ class TransferOptions extends Component {
     this.setState({ notificationOpen: false });
   };
 
+  handleCurrencyChange = (event) => {
+    const selectedIndex = event.target.value;
+    event.target.value = this.state.currencies[selectedIndex];
+    this.setState({ fromCurrency: this.state.currencies[selectedIndex] });
+  };
+
   render() {
-    const { transactionTransfer, fetchedPin, successDialogOpen, notificationOpen, searchResults, selectedAccount } = this.state;
+    const { transactionTransfer, successDialogOpen, notificationOpen, searchResults, selectedAccount, currencies, fromCurrency } = this.state;
 
     return (
       <div>
-        {/* First Box */}
         <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
           <Typography variant="h6" gutterBottom>
             Find Account
@@ -178,7 +166,6 @@ class TransferOptions extends Component {
           </form>
         </Paper>
 
-        {/* Display search results */}
         {searchResults.length > 0 && (
           <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
             <Typography variant="h6" gutterBottom>
@@ -196,7 +183,6 @@ class TransferOptions extends Component {
           </Paper>
         )}
 
-        {/* Conditionally render the "Transfer Money" section */}
         {selectedAccount && (
           <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
             <Typography variant="h6" gutterBottom>
@@ -218,42 +204,41 @@ class TransferOptions extends Component {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    required
-                    id="currency"
-                    name="currency"
                     select
                     label="Currency"
+                    value={fromCurrency.id}
+                    onChange={this.handleCurrencyChange}
                     fullWidth
-                    value={transactionTransfer.currency}
-                    onChange={this.handleChange}
+                    margin="normal"
+                    variant="outlined"
                   >
-                    <MenuItem value="Knut">Knut</MenuItem>
-                    <MenuItem value="Sickle">Sickle</MenuItem>
-                    <MenuItem value="Galleon">Galleon</MenuItem>
-                    {/* Add more currencies as needed */}
+                    {currencies.map((currency, index) => (
+                      <MenuItem key={index} value={index}>
+                        {currency.name}
+                      </MenuItem>
+                    ))}
                   </TextField>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
                     required
-                    id="pin"
-                    name="pin"
+                    id="securityPIN"
+                    name="securityPIN"
                     label="Security PIN"
                     fullWidth
                     type="password"
-                    value={fetchedPin}
+                    value={transactionTransfer.securityPIN}
                     onChange={this.handleChange}
                   />
                 </Grid>
               </Grid>
-              <Button type="submit" variant="contained" color="primary" style={{ marginTop: '20px' }}>
+              <Button variant="contained" color="primary" style={{ marginTop: '20px' }}>
                 Proceed
               </Button>
             </form>
           </Paper>
         )}
-        
-        {/* Success Dialog */}
+
         <Dialog
           open={successDialogOpen}
           onClose={this.handleSuccessDialogClose}
@@ -275,7 +260,7 @@ class TransferOptions extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        {/* Notification */}
+
         <Snackbar
           open={notificationOpen}
           autoHideDuration={6000}
