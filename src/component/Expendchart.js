@@ -8,123 +8,214 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import axios from 'axios';
 
-export default function ExpensePieChart() {
-  const [month, setMonth] = useState('January');
-  const [expensesData, setExpensesData] = useState({});
+const ExpensePieChart = () => {
+  const [transactions, setTransactions] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [categorizedData, setCategorizedData] = useState({});
+  const [pieChartData, setPieChartData] = useState([]);
 
-  useEffect(() => {
-    const fetchExpensesData = async () => {
-      try {
-        // Fetch expenses data from the backend
-        const response = await axios.get('http://localhost:8080/transactions/{accountId}');
-        setExpensesData(response.data);
-      } catch (error) {
-        console.error('Error fetching expenses data:', error);
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const fetchTransactions = async () => {
+    try {
+
+      // Fetch transactions data from the backend
+      const response = await axios.get('http://localhost:8080/transactions/' + localStorage.getItem('accountID'));
+
+      if (response.data) {
+
+        const mappedTransactions = response.data.map(transaction => ({
+          date: new Date(transaction.date),
+          amount: transaction.amount,
+          currency: transaction.currency.abbreviation,
+          category: transaction.category,
+        }));
+        
+        setTransactions(mappedTransactions);
+
       }
-    };
+      
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    }
+  };
+  
+  useEffect(() => {
 
-    fetchExpensesData();
+    fetchTransactions();
+    
   }, []);
 
-  const handleMonthChange = (event) => {
-    setMonth(event.target.value);
-  };
+  useEffect(() => {
+    // Filter transactions by selected month
+    const filteredTransactions = transactions.filter(transaction =>
+      new Date(transaction.date).getMonth() === selectedMonth
+    );
 
-  // Safely access the selected data and ensure arrays exist
-  const selectedData = expensesData[month] || { sickle: [], knut: [], galleon: [] };
+    // Categorize transactions by currency and calculate total amount for each currency
+    const data = filteredTransactions.reduce((acc, transaction) => {
+      const currency = transaction.currency;
+      acc[currency] = acc[currency] || 0;
+      acc[currency] += transaction.amount;
+      return acc;
+    }, {});
 
-  // Calculate total expenses for each category
-  const totalExpenses = {
-    sickle: selectedData.sickle.reduce((total, expense) => total + expense.value, 0),
-    knut: selectedData.knut.reduce((total, expense) => total + expense.value, 0),
-    galleon: selectedData.galleon.reduce((total, expense) => total + expense.value, 0)
-  };
+    setCategorizedData(data);
+
+    // Create data for pie charts
+    const pieData = Object.entries(data).map(([currency, amount]) => ({
+      currency,
+      value: amount,
+    }));
+    setPieChartData(pieData);
+
+    // Set categories for rendering Select options
+    const uniqueCategories = [...new Set(transactions.map(transaction => transaction.category))];
+    setCategories(uniqueCategories);
+  }, [selectedMonth, transactions]);
 
   return (
-    <Box
-      p="10%"
-      sx={{
-        backgroundColor: '#ffffff', // Set to white or any color you prefer
-        borderRadius: '8px', // Optional: add border radius
-        boxShadow: 3, // Optional: add shadow for better visual appearance
-      }}
-    >
-      <FormControl fullWidth sx={{ mb: 4 }}>
-        <InputLabel id="month-select-label">Select Month</InputLabel>
+    <Box>
+      <FormControl fullWidth>
+        <InputLabel>Select Month</InputLabel>
         <Select
-          labelId="month-select-label"
-          id="month-select"
-          value={month}
-          label="Select Month"
-          onChange={handleMonthChange}
+          value={selectedMonth}
+          onChange={event => setSelectedMonth(event.target.value)}
         >
-          {Object.keys(expensesData).map((monthName) => (
-            <MenuItem key={monthName} value={monthName}>
-              {monthName}
+          {/* Render options for months */}
+          {Array.from({ length: 12 }, (_, i) => i).map(month => (
+            <MenuItem key={month} value={month}>
+              {months[month]}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
 
-      {/* Sickle Expenses Chart */}
-      <PieChart
-        series={[
-          {
-            data: selectedData.sickle.map((expense) => ({
-              ...expense,
-              label: `${expense.label} (${((expense.value / totalExpenses.sickle) * 100).toFixed(1)}%)`
-            })),
-          },
-        ]}
-        width={300}
-        height={300}
-        label={{
-          textAnchor: 'middle', // Center the labels horizontally
-        }}
-      />
-      <Typography variant="h6" align="center" sx={{ mt: 4 }}>
-        Total Expenses (Sickle): {totalExpenses.sickle}
-      </Typography>
+      {/* Render pie charts for each currency */}
+      {Object.entries(categorizedData).map(([currency, amount], index) => (
+        <Box key={index}>
+          <Typography variant="h6">{currency}</Typography>
+          <PieChart
+            data={pieChartData.filter(data => data.currency === currency)}
+            // Add other pie chart props as needed
+          />
+        </Box>
+      ))}
 
-      {/* Knut Expenses Chart */}
-      <PieChart
-        series={[
-          {
-            data: selectedData.knut.map((expense) => ({
-              ...expense,
-              label: `${expense.label} (${((expense.value / totalExpenses.knut) * 100).toFixed(1)}%)`
-            })),
-          },
-        ]}
-        width={300}
-        height={300}
-        label={{
-          textAnchor: 'middle', // Center the labels horizontally
-        }}
-      />
-      <Typography variant="h6" align="center" sx={{ mt: 4 }}>
-        Total Expenses (Knut): {totalExpenses.knut}
-      </Typography>
-
-      {/* Galleon Expenses Chart */}
-      <PieChart
-        series={[
-          {
-            data: selectedData.galleon.map((expense) => ({
-              ...expense,
-              label: `${expense.label} (${((expense.value / totalExpenses.galleon) * 100).toFixed(1)}%)`
-            })),
-          },
-        ]}
-        width={300}
-        height={300}
-        label={{
-          textAnchor: 'middle', // Center the labels horizontally
-        }}
-      />
-      <Typography variant="h6" align="center" sx={{ mt: 4 }}>
-        Total Expenses (Galleon): {totalExpenses.galleon}
-      </Typography>
+      {/* Display a message if there are no transactions for the selected month */}
+      {transactions.length === 0 && (
+        <Typography variant="body1">No expenses for the selected month.</Typography>
+      )}
     </Box>
   );
-}
+};
+
+export default ExpensePieChart;
+
+// import React, { useState, useEffect } from 'react';
+// import { PieChart } from '@mui/x-charts/PieChart';
+// import Box from '@mui/material/Box';
+// import Typography from '@mui/material/Typography';
+// import MenuItem from '@mui/material/MenuItem';
+// import Select from '@mui/material/Select';
+// import FormControl from '@mui/material/FormControl';
+// import InputLabel from '@mui/material/InputLabel';
+// import axios from 'axios';
+
+// const ExpensePieChart = () => {
+//   const [transactions, setTransactions] = useState([]);
+//   const [selectedMonth, setSelectedMonth] = useState('');
+//   const [categories, setCategories] = useState([]);
+//   const [categorizedData, setCategorizedData] = useState({});
+//   const [pieChartData, setPieChartData] = useState([]);
+
+
+//   const months = [
+//     'January', 'February', 'March', 'April', 'May', 'June', 
+//     'July', 'August', 'September', 'October', 'November', 'December'
+//   ];
+
+//   useEffect(() => {
+//     const fetchTransactions = async () => {
+//       try {
+//         // Fetch transactions data from the backend
+//         const response = await axios.get('http://localhost:8080/transactions/' + localStorage.getItem('accountID'));
+//         const mappedTransactions = response.data.map(transaction => ({
+//           date: new Date(transaction.date).toLocaleString(),
+//           amount: transaction.amount,
+//           currency: transaction.currency.abbreviation,
+//           category: transaction.category,
+//         }));
+//         setTransactions(mappedTransactions);
+//       } catch (error) {
+//         console.error('Error fetching transactions:', error);
+//       }
+//     };
+
+//     fetchTransactions();
+//   }, []);
+
+//   useEffect(() => {
+//     // Filter transactions by selected month
+//     const filteredTransactions = transactions.filter(transaction =>
+//       new Date(transaction.date).getMonth() === selectedMonth
+//     );
+
+//     // Categorize transactions by currency and calculate total amount for each currency
+//     const data = filteredTransactions.reduce((acc, transaction) => {
+//       const currency = transaction.currency;
+//       acc[currency] = acc[currency] || 0;
+//       acc[currency] += transaction.amount;
+//       return acc;
+//     }, {});
+
+//     setCategorizedData(data);
+
+//     // Create data for pie charts
+//     const pieData = Object.entries(data).map(([currency, amount]) => ({
+//       currency,
+//       value: amount,
+//     }));
+//     setPieChartData(pieData);
+
+//     // Set categories for rendering Select options
+//     const uniqueCategories = [...new Set(transactions.map(transaction => transaction.category))];
+//     setCategories(uniqueCategories);
+//   }, [selectedMonth, transactions]);
+
+//   return (
+//     <Box>
+//       <FormControl fullWidth>
+//         <InputLabel>Select Month</InputLabel>
+//         <Select
+//           value={selectedMonth}
+//           onChange={event => setSelectedMonth(event.target.value)}
+//         >
+//           {/* Render options for months */}
+//           {Array.from({ length: 12 }, (_, i) => i).map(month => (
+//             <MenuItem key={month} value={month}>
+//               {months[month]}
+//             </MenuItem>
+//           ))}
+//         </Select>
+//       </FormControl>
+
+//       {/* Render pie charts for each currency */}
+//       {Object.entries(categorizedData).map(([currency, amount], index) => (
+//         <Box key={index}>
+//           <Typography variant="h6">{currency}</Typography>
+//           <PieChart
+//             data={pieChartData.filter(data => data.currency === currency)}
+//             // Add other pie chart props as needed
+//           />
+//         </Box>
+//       ))}
+//     </Box>
+//   );
+// };
+
+// export default ExpensePieChart;

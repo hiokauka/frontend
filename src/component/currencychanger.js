@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, MenuItem, Button, Typography, Paper } from '@mui/material';
+import { TextField, MenuItem, Button, Typography, Paper, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import axios from 'axios';
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-
-
 
 const CurrencyChanger = () => {
   const [amount, setAmount] = useState('');
@@ -19,7 +16,6 @@ const CurrencyChanger = () => {
   const processExchangeUrl = 'http://localhost:8080/exchange/process';
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
-  
 
   useEffect(() => {
     const currenciesURL = 'http://localhost:8080/currencies/all';
@@ -27,7 +23,6 @@ const CurrencyChanger = () => {
       try {
         const response = await axios.get(currenciesURL);
         setCurrency(response.data);
-        
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -39,25 +34,12 @@ const CurrencyChanger = () => {
     const selectedIndex = event.target.value;
     event.target.value = Currencies[selectedIndex];
     setFromCurrency(Currencies[selectedIndex]);
-    if (fromCurrency && Object.keys(fromCurrency).length > 0) {
-      console.log('fromCurrency:', fromCurrency);
-      // You can also render something based on this condition
-    } else {
-      console.log('fromCurrency is not set properly');
-    }
-    
   };
-  
+
   const handleCurrencyChange2 = (event) => {
     const selectedIndex = event.target.value;
     event.target.value = Currencies[selectedIndex];
     setToCurrency(Currencies[selectedIndex]);
-    if (toCurrency && Object.keys(toCurrency).length > 0) {
-      console.log('toCurrency:', toCurrency);
-      // You can also render something based on this condition
-    } else {
-      console.log('toCurrency is not set properly');
-    }
   };
 
   const handleConvert = async () => {
@@ -70,11 +52,9 @@ const CurrencyChanger = () => {
 
       const response = await axios.post(exchangeURL, requestData);
       const exchangeData = response.data;
-      console.log('Exchange Data:', exchangeData);
 
       if (exchangeData) {
         const initialAmount = exchangeData.initialAmount;
-        const exchangeRate = exchangeData.exchangedamount;
         const fees = exchangeData.totalProcessingFee.toFixed(2);
         const convertedAmount = exchangeData.exchangedAmount;
 
@@ -83,7 +63,7 @@ const CurrencyChanger = () => {
         setConversionDetails(
           `${initialAmount} ${fromCurrency.name} = ${convertedAmount} ${toCurrency.name}, total processing fees = ${fees} ${fromCurrency.name}`
         );
-        
+
         setShowProcess(true);
       }
     } catch (error) {
@@ -92,28 +72,23 @@ const CurrencyChanger = () => {
   };
 
   const handleProcess = async () => {
-  try {
-    const processExchangeRequestDTO = {
-      accountID: localStorage.getItem('accountID'),
-      fromCurrencyID: fromCurrency.currencyID,
-      toCurrencyID: toCurrency.currencyID,
-      initialAmount: parseFloat(amount)
-    };
+    try {
+      const processExchangeRequestDTO = {
+        accountID: localStorage.getItem('accountID'),
+        fromCurrencyID: fromCurrency.currencyID,
+        toCurrencyID: toCurrency.currencyID,
+        initialAmount: parseFloat(amount)
+      };
 
-    const response = await axios.post(processExchangeUrl, processExchangeRequestDTO);
-    const result = response.data;
+      const response = await axios.post(processExchangeUrl, processExchangeRequestDTO);
+      const result = response.data;
 
-    // Set the Snackbar message to the successful response data
-    setSnackbarMessage(result);
-
-    // Open the Snackbar
-    setOpenSnackbar(true);
-  } catch (error) {
-    console.error('Error processing exchange:', error);
-    // Handle error case if necessary
-  }
-};
-
+      setOpenDialog(true);
+      setDialogMessage(result);
+    } catch (error) {
+      console.error('Error processing exchange:', error);
+    }
+  };
 
   return (
     <Paper sx={{ padding: 2 }}>
@@ -169,16 +144,19 @@ const CurrencyChanger = () => {
           <Button variant="contained" color="primary" onClick={handleProcess} sx={{ mt: 2 }}>
             Process
           </Button>
-
         </>
       )}
-      <Snackbar
-  open={openSnackbar}
-  autoHideDuration={6000} // Adjust the duration as needed
-  onClose={() => setOpenSnackbar(false)}
-  message={snackbarMessage}
-/>
-
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Conversion Status</DialogTitle>
+        <DialogContent>
+          <Typography>{dialogMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   );
 };

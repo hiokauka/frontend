@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import {
   Typography,
   Grid,
@@ -13,6 +14,7 @@ import {
   DialogActions,
   Snackbar,
 } from '@mui/material';
+
 import axios from 'axios';
 
 class TransferOptions extends Component {
@@ -34,22 +36,12 @@ class TransferOptions extends Component {
       fetchedPin: '',
       successDialogOpen: false,
       notificationOpen: false,
-      accountFound: false, // New state variable
+      accountFound: false,
+      searchResults: [], // New state variable to store search results
+      selectedAccount: null, // New state variable to store selected account
+      targetAccount: null
     };
   }
-
-  componentDidMount() {
-    this.fetchPin();
-  }
-
-  fetchPin = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080'); // Replace with your actual API endpoint
-      this.setState({ fetchedPin: response.data.pin });
-    } catch (error) {
-      console.error('Error fetching the PIN:', error);
-    }
-  };
 
   handleChange = (event) => {
     const { name, value } = event.target;
@@ -61,10 +53,67 @@ class TransferOptions extends Component {
     }));
   };
 
+  handleSearchSubmit = async (event) => {
+    event.preventDefault();
+    const { transactionTransfer } = this.state;
+    const { searchQuery } = transactionTransfer;
+    
+    try {
+      const response = await axios.get(`http://localhost:8080/accounts/search?fullName=${searchQuery}`);
+      const searchResults = response.data;
+
+      if (searchResults.length === 0) {
+
+        try {
+
+          const response = await axios.get(`http://localhost:8080/accounts/search?telephoneNumber=${searchQuery}`);
+          const searchResults = response.data;
+
+          if (searchResults.length === 0) {
+            alert('No account found');
+
+            return;
+
+          } else {
+
+            this.setState({ searchResults });
+
+          }
+
+        } catch (error) {
+
+          alert('There was an error while searching for accounts, please try again.', error);
+
+          return;
+          
+        }
+        
+      } else {
+
+        this.setState({ searchResults });
+
+      }
+      
+    } catch (error) {
+
+      console.error('There was an error while searching for accounts, please try again.', error);
+
+    }
+
+  };
+
+  handleAccountSelect = async (account) => {
+
+    await this.setState({ selectedAccount: account });
+
+    const { selectedAccount } = this.state;
+
+  };
+
   handleSubmit = async (event) => {
     event.preventDefault();
     const { pin, fetchedPin, transactionTransfer } = this.state;
-    const { amount, currency, searchQuery } = transactionTransfer;
+    const { amount, currency } = transactionTransfer;
     
     if (pin !== fetchedPin) {
       alert('Invalid PIN');
@@ -72,30 +121,12 @@ class TransferOptions extends Component {
     }
 
     try {
-      // Simulating the search result for demo purpose
-      const accountFound = searchQuery !== ''; // Modify this based on your actual search logic
+      // Simulating the transfer process
+      // Here, you would send the transfer details to your backend API
+      console.log('Transfer details:', transactionTransfer);
       
-      // Set the accountFound state based on the search result
-      this.setState({ accountFound });
-
-      // If the account was found, proceed with the transfer
-      if (accountFound) {
-        const response = await axios.post('https://your-backend-api.com/transfer', {
-          amount,
-          currency,
-          searchQuery,
-        });
-        console.log('Form submitted:', response.data);
-        this.setState({
-          transactionTransfer: {
-            ...transactionTransfer,
-            amount: '',
-            currency: '',
-            searchQuery: '',
-          },
-          successDialogOpen: true,
-        });
-      }
+      // After successful transfer, open success dialog
+      this.setState({ successDialogOpen: true });
     } catch (error) {
       console.error('There was an error submitting the form:', error);
     }
@@ -106,7 +137,8 @@ class TransferOptions extends Component {
   };
 
   handlePrintReceipt = () => {
-    console.log('Printing receipt...');
+    console.log('Downloading receipt...');
+    // Here, you would implement the logic to download the receipt
   };
 
   handleNotificationClose = (event, reason) => {
@@ -117,7 +149,7 @@ class TransferOptions extends Component {
   };
 
   render() {
-    const { transactionTransfer, fetchedPin, successDialogOpen, notificationOpen, accountFound } = this.state;
+    const { transactionTransfer, fetchedPin, successDialogOpen, notificationOpen, searchResults, selectedAccount } = this.state;
 
     return (
       <div>
@@ -126,7 +158,7 @@ class TransferOptions extends Component {
           <Typography variant="h6" gutterBottom>
             Find Account
           </Typography>
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={this.handleSearchSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <TextField
@@ -146,9 +178,27 @@ class TransferOptions extends Component {
           </form>
         </Paper>
 
+        {/* Display search results */}
+        {searchResults.length > 0 && (
+          <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
+            <Typography variant="h6" gutterBottom>
+              Search Results
+            </Typography>
+            <Grid container spacing={3}>
+              {searchResults.map((account) => (
+                <Grid item xs={12} key={account.accountID}>
+                  <Button variant="outlined" onClick={() => this.handleAccountSelect(account)}>
+                    {account.fullName} - {account.telephoneNumber}
+                  </Button>
+                </Grid>
+              ))}
+            </Grid>
+          </Paper>
+        )}
+
         {/* Conditionally render the "Transfer Money" section */}
-        {accountFound && (
-          <Paper elevation={3} style={{ padding: '20px' }}>
+        {selectedAccount && (
+          <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
             <Typography variant="h6" gutterBottom>
               Transfer Money
             </Typography>
@@ -212,7 +262,7 @@ class TransferOptions extends Component {
         >
           <DialogTitle id="alert-dialog-title">{"Transfer Successful!"}</DialogTitle>
           <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+            <DialogContentText id="alert-dialog-description">
               Your transfer was successful. Do you want to print the receipt?
             </DialogContentText>
           </DialogContent>
