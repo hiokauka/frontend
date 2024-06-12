@@ -141,7 +141,7 @@ export default function Dashboard() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Welcome, user
+               Welcome, {localStorage.getItem('username')}
             </Typography>
             <Button color="inherit" onClick={handleDialogOpen}>
               Logout

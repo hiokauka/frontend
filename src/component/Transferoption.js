@@ -104,6 +104,7 @@ class TransferOptions extends Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
+  
     const { transactionTransfer } = this.state;
     const { amount, currency } = transactionTransfer;
 
