@@ -18,7 +18,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import Container from '@mui/material/Container'; // <-- Add this import
+import Container from '@mui/material/Container';
 import { mainListItems } from '../dashboard/listItems';
 import { useNavigate } from 'react-router-dom';
 import TransferOptions from './Transferoption';
@@ -28,8 +28,8 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" >
+        Fitri and Friends
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -47,7 +47,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: '#5A2207',
+  backgroundColor: '#201200',
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
@@ -84,8 +84,17 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const theme = createTheme({
+  typography: {
+    fontFamily: ['Bigelow Rules', 'sans-serif'].join(','),
+    h6: {
+      fontSize: '2rem',
+    },
+    body1: {
+      fontSize: '1.5rem',
+    },
+  },
+});
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
@@ -98,13 +107,10 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-
     console.log('Logout confirmed');
-
     logout();
-
     setDialogOpen(false);
-    navigate('/signin'); // Redirect to sign-in page
+    navigate('/signin');
   };
 
   const handleDialogOpen = () => {
@@ -116,7 +122,7 @@ export default function Dashboard() {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <AppBar position="absolute" open={open}>
@@ -146,7 +152,7 @@ export default function Dashboard() {
             >
                Welcome, {localStorage.getItem('username')}
             </Typography>
-            <Button color="inherit" onClick={handleDialogOpen}>
+            <Button color="inherit" onClick={handleDialogOpen} sx={{ fontSize: '1.5rem' }} variant="body1">
               Logout
             </Button>
           </Toolbar>
@@ -167,7 +173,6 @@ export default function Dashboard() {
           <Divider />
           <List component="nav">
             {mainListItems}
-          
           </List>
         </Drawer>
         <Box
@@ -177,7 +182,7 @@ export default function Dashboard() {
             height: '100vh',
             overflow: 'auto',
             position: 'relative',
-            backgroundImage: 'url(/bggringgot.jpg)', // Replace with your image path
+            backgroundImage: 'url(/bggringgot.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             zIndex: 1,
@@ -185,7 +190,7 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <TransferOptions/>
+            <TransferOptions />
             <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>

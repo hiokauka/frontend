@@ -73,13 +73,13 @@ const ForgotPasswordPage = () => {
   return (
     <Grid container spacing={2} justifyContent="center" alignItems="center">
       <Grid item xs={12} textAlign="center">
-        <Typography variant="h4" style={{ color: 'white' }}>Forgot Password?</Typography>
-        <Typography variant="body1" style={{ color: 'white' }}>Please enter your username to find your account.</Typography>
+        <Typography variant="h4" style={{ color: 'gold', fontFamily: 'Bigelow Rules', fontSize: '3rem', fontWeight: 'bold' }}>Forgot Password?</Typography>
+        <Typography variant="body1" style={{ color: 'gold', fontFamily: 'Bigelow Rules', fontSize: '1.75rem' }}>Please enter your username to find your account.</Typography>
       </Grid>
       <Grid item xs={12} md={6}>
         <TextField
           fullWidth
-          label="Username"
+          label={<Typography sx={{ fontFamily: 'Bigelow Rules', fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center' }}>Username</Typography>}
           size="small"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -90,7 +90,7 @@ const ForgotPasswordPage = () => {
       </Grid>
       <Grid item xs={12} textAlign="center">
         <Button variant="contained" color="primary" onClick={handleFindAccount}>
-          Find Account
+          <Typography sx={{ fontFamily: 'Bigelow Rules', fontSize: '1.25rem' }}>Find Account</Typography>
         </Button>
       </Grid>
       {accountFound && (
