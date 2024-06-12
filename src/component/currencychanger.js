@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, MenuItem, Button, Typography, Paper } from '@mui/material';
 import axios from 'axios';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+
+
 
 const CurrencyChanger = () => {
   const [amount, setAmount] = useState('');
@@ -14,6 +17,9 @@ const CurrencyChanger = () => {
   const [balances, setBalances] = useState({});
   const exchangeURL = 'http://localhost:8080/exchange/convert';
   const processExchangeUrl = 'http://localhost:8080/exchange/process';
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState('');
+  
 
   useEffect(() => {
     const currenciesURL = 'http://localhost:8080/currencies/all';
@@ -69,7 +75,7 @@ const CurrencyChanger = () => {
       if (exchangeData) {
         const initialAmount = exchangeData.initialAmount;
         const exchangeRate = exchangeData.exchangedamount;
-        const fees = exchangeData.totalProcessingFee;
+        const fees = exchangeData.totalProcessingFee.toFixed(2);
         const convertedAmount = exchangeData.exchangedAmount;
 
         setProcessingFees(fees);
@@ -86,22 +92,28 @@ const CurrencyChanger = () => {
   };
 
   const handleProcess = async () => {
-    
+  try {
     const processExchangeRequestDTO = {
-
-      "accountID": localStorage.getItem('accountID'),
-      "fromCurrencyID": fromCurrency.currencyID,
-      "toCurrencyID": toCurrency.currencyID,
-      "initialAmount": parseFloat(amount)
-
+      accountID: localStorage.getItem('accountID'),
+      fromCurrencyID: fromCurrency.currencyID,
+      toCurrencyID: toCurrency.currencyID,
+      initialAmount: parseFloat(amount)
     };
 
     const response = await axios.post(processExchangeUrl, processExchangeRequestDTO);
-
     const result = response.data;
-    console.log(result);
 
-  };
+    // Set the Snackbar message to the successful response data
+    setSnackbarMessage(result);
+
+    // Open the Snackbar
+    setOpenSnackbar(true);
+  } catch (error) {
+    console.error('Error processing exchange:', error);
+    // Handle error case if necessary
+  }
+};
+
 
   return (
     <Paper sx={{ padding: 2 }}>
@@ -160,6 +172,13 @@ const CurrencyChanger = () => {
 
         </>
       )}
+      <Snackbar
+  open={openSnackbar}
+  autoHideDuration={6000} // Adjust the duration as needed
+  onClose={() => setOpenSnackbar(false)}
+  message={snackbarMessage}
+/>
+
     </Paper>
   );
 };

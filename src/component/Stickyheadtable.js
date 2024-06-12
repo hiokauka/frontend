@@ -40,33 +40,42 @@ export default function StickyHeadTable() {
   const transactionsURL = 'http://localhost:8080/transactions/' + localStorage.getItem('accountID');
 
   const fetchTransactions = async () => {
-      
     try {
-
       const response = await axios.get(transactionsURL);
-      const mappedTransactions = response.data.map(transaction => ({
-        transactionId: transaction.transactionId,
-        date: new Date(transaction.date).toLocaleString(),
-        fromAccount: transaction.fromAccount.fullName,
-        toAccount: transaction.toAccount.fullName,
-        paymentMethod: transaction.paymentMethod,
-        cardNumber: transaction.card.cardNumber,
-        amount: transaction.amount,
-        currency: transaction.currency.abbreviation,
-        category: transaction.category,
-        downloadReceipt: transaction.receiptFileName
-
-      }));
-
+      const mappedTransactions = response.data.map(transaction => {
+        // Log each transaction to identify the problematic one
+        console.log('Transaction:', transaction);
+        
+        const mappedTransaction = {
+          transactionId: transaction.transactionId,
+          date: new Date(transaction.date).toLocaleString(),
+          fromAccount: transaction.fromAccount.fullName,
+          toAccount: transaction.toAccount.fullName,
+          paymentMethod: transaction.paymentMethod,
+          amount: transaction.amount,
+          currency: transaction.currency.abbreviation,
+          category: transaction.category,
+          downloadReceipt: transaction.receiptFileName
+        };
+  
+        // Check if card exists before accessing its properties
+        if (transaction.card && transaction.card.cardNumber) {
+          mappedTransaction.cardNumber = transaction.card.cardNumber;
+        } else {
+          mappedTransaction.cardNumber = 'N/A'; // or any default value
+        }
+        
+        return mappedTransaction;
+      });
+  
+      console.log('Fetched Transactions:', mappedTransactions);
+  
       setTransactions(mappedTransactions);
-
     } catch (error) {
-
       console.error('Error fetching transactions', error);
-
     }
   };
-
+  
   useEffect(() => {
     
     fetchTransactions();
